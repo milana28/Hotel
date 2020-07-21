@@ -24,6 +24,7 @@ namespace Hotel.Domain
         {
             var newCustomer = new Models.Customer()
             {
+                Id = GenerateCustomerId(),
                 Name = customer.Name,
                 PhoneNo = customer.PhoneNo,
                 Address = customer.Address,
@@ -61,6 +62,16 @@ namespace Hotel.Domain
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
            
             return database.Query<Models.Customer>("SELECT * FROM Hotel.Customer").ToList();
+        }
+        
+        private int GenerateCustomerId()
+        {
+            var customers = GetAll();
+            var idList = new List<int>();
+            customers.ForEach(c => idList.Add(c.Id));
+            var last = idList.Max();
+
+            return last + 1;
         }
     }
 }

@@ -133,7 +133,7 @@ namespace Hotel.Domain
             var reservations = GetAll();
             var idList = new List<int>();
             reservations.ForEach(r => idList.Add(r.Id));
-            var last = idList[^1];
+            var last = idList.Max();
 
             return last + 1;
         }
