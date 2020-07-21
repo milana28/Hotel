@@ -21,6 +21,12 @@ namespace Hotel.Domain
     {
         private const string DatabaseConnectionString = "Server=localhost;Database=hotel;User Id=sa;Password=yourStrong(!)Password;";
         private readonly List<Models.Customer> _customers = new List<Models.Customer>();
+        private readonly IRoom _room;
+
+        public Customer(IRoom room)
+        {
+            _room = room;
+        }
 
         public Models.Customer CreateCustomer(Models.Customer guest)
         {
@@ -90,19 +96,11 @@ namespace Hotel.Domain
             };
         }
 
-        private Room GetRoomByRoomNo(int roomNo)
-        {
-            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            const string sql = "SELECT * FROM Hotel.Room WHERE roomNo = @number";
-
-            return database.QuerySingle<Room>(sql, new {number = roomNo});
-        }
-
         private Room CheckIfRoomExist(int roomNo, Models.Customer customer)
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             var rooms = database.Query<Models.Room>("SELECT * FROM Hotel.Room").ToList();
-            var room = GetRoomByRoomNo(roomNo);
+            var room = _room.GetRoomByRoomNo(roomNo);
 
             var roomList = rooms.Where(r => r.RoomNo == roomNo && r.Location == customer.Room.Location);
 
