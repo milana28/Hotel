@@ -4,7 +4,6 @@ using System.Data.SqlClient;
 using System.Linq;
 using Dapper;
 using Hotel.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Hotel.Domain
 {
@@ -20,34 +19,21 @@ namespace Hotel.Domain
     public class Customer : ICustomer
     {
         private const string DatabaseConnectionString = "Server=localhost;Database=hotel;User Id=sa;Password=yourStrong(!)Password;";
-        private readonly List<Models.Customer> _customers = new List<Models.Customer>();
-        private readonly IRoom _room;
 
-        public Customer(IRoom room)
+        public Models.Customer CreateCustomer(Models.Customer customer)
         {
-            _room = room;
-        }
-
-        public Models.Customer CreateCustomer(Models.Customer guest)
-        {
-            var guestDao = new CustomerDAO()
+            var newCustomer = new Models.Customer()
             {
-                Name = guest.Name,
-                PhoneNo = guest.PhoneNo,
-                Address = guest.Address,
-                RoomNo = guest.Room.RoomNo
+                Name = customer.Name,
+                PhoneNo = customer.PhoneNo,
+                Address = customer.Address,
             };
-
-            if (CheckIfRoomExist(guest.Room.RoomNo, guest) == null)
-            {
-                return null;
-            }
-        
+            
             using IDbConnection database = new SqlConnection(DatabaseConnectionString); 
-            const string insertQuery = "INSERT INTO Hotel.Customer VALUES (@name, @phoneNo, @address, @roomNo)";
-            database.Execute(insertQuery, guestDao);
+            const string insertQuery = "INSERT INTO Hotel.Customer VALUES (@name, @phoneNo, @address)";
+            database.Execute(insertQuery, newCustomer);
 
-            return TransformDaoToBusinessLogicCustomer(guestDao);
+            return newCustomer;
         }
 
         public Models.Customer DeleteCustomer(int guestId)
@@ -65,46 +51,16 @@ namespace Hotel.Domain
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             const string sql = "SELECT * FROM Hotel.Customer WHERE id = @customerId";
             
-            var customerDao = database.QuerySingle<CustomerDAO>(sql, new {customerId = id});
+            var customer = database.QuerySingle<Models.Customer>(sql, new {customerId = id});
 
-            return TransformDaoToBusinessLogicCustomer(customerDao);
+            return customer;
         }
 
         public List<Models.Customer> GetAll()
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            var customerDaoList = database.Query<CustomerDAO>("SELECT * FROM Hotel.Customer").ToList();
-
-            customerDaoList.ForEach(e => _customers.Add(TransformDaoToBusinessLogicCustomer(e)));
-
-            return _customers;
-        }
-
-        private Models.Customer TransformDaoToBusinessLogicCustomer(CustomerDAO customerDao)
-        {
-            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            const string sql = "SELECT * FROM Hotel.Room WHERE roomNo = @roomNo";
-            var room = database.QuerySingle<Models.Room>(sql, new {roomNo = customerDao.RoomNo});
-
-            return new Models.Customer()
-            {
-                Id = customerDao.Id,
-                Name = customerDao.Name,
-                PhoneNo = customerDao.PhoneNo,
-                Address = customerDao.Address,
-                Room = room
-            };
-        }
-
-        private Room CheckIfRoomExist(int roomNo, Models.Customer customer)
-        {
-            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            var rooms = database.Query<Models.Room>("SELECT * FROM Hotel.Room").ToList();
-            var room = _room.GetRoomByRoomNo(roomNo);
-
-            var roomList = rooms.Where(r => r.RoomNo == roomNo && r.Location == customer.Room.Location);
-
-            return !roomList.Any() ? null : room;
+           
+            return database.Query<Models.Customer>("SELECT * FROM Hotel.Customer").ToList();
         }
     }
 }
