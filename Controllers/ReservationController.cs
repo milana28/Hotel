@@ -23,16 +23,16 @@ namespace Hotel.Controllers
         [ProducesResponseType(StatusCodes.Status405MethodNotAllowed)]
         public ActionResult<Models.Reservation> CreateReservation(Models.Reservation reservation)
         {
-            return _reservation.CheckIn(reservation);
+            return _reservation.CreateReservation(reservation);
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<List<Models.Reservation>> GetCustomers()
+        public ActionResult<List<Models.Reservation>> GetCustomers([FromQuery(Name = "room")] int? roomNo)
         {
-            return _reservation.GetAll();
+            return _reservation.GetReservations(roomNo);
         }
 
         [HttpGet("{reservationId}")]
@@ -63,7 +63,7 @@ namespace Hotel.Controllers
                 return NotFound();
             }
 
-            return _reservation.CheckOut(reservationId);
+            return _reservation.DeleteReservation(reservationId);
         }
     }
 }
