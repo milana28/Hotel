@@ -14,6 +14,8 @@ namespace Hotel.Domain
         Models.Reservation DeleteReservation(int guestId);
         Models.Reservation GetReservationById(int id);
         List<Models.Reservation> GetReservations(int? roomNo);
+        Models.Reservation CheckIn(int reservationId, Models.Reservation reservation);
+        Models.Reservation CheckOut(int reservationId, Models.Reservation reservation);
     }
     
     public class Reservation : IReservation
@@ -21,10 +23,7 @@ namespace Hotel.Domain
         private const string DatabaseConnectionString = "Server=localhost;Database=hotel;User Id=sa;Password=yourStrong(!)Password;";
         private readonly IRoom _room;
         private readonly ICustomer _customer;
-        DateTime rngMin = (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue;
-
-        DateTime rngMax = (DateTime)System.Data.SqlTypes.SqlDateTime.MaxValue;
-        
+    
         public Reservation(IRoom room, ICustomer customer)
         {
             _room = room;
@@ -39,8 +38,8 @@ namespace Hotel.Domain
                 CustomerId = reservation.Customer.Id,
                 RoomNo = reservation.Room.RoomNo,
                 Date = DateTime.Now,
-                CheckInDate = DateTime.Now,
-                CheckOutDate = DateTime.Now
+                CheckInDate = null,
+                CheckOutDate = null
             };
           
             if (CheckIfRoomExist(reservation.Room.RoomNo, reservation) == null || CheckIfCustomerExist(reservation.Customer.Id, reservation) == null)
@@ -53,6 +52,54 @@ namespace Hotel.Domain
             database.Execute(insertQuery, reservationDao);
 
             return TransformDaoToBusinessLogicReservation(reservationDao);
+        }
+        
+        public Models.Reservation CheckIn(int reservationId, Models.Reservation reservation)
+        {
+            var reservationDao = new ReservationDAO()
+            {
+                Id = reservationId,
+                CustomerId = reservation.Customer.Id,
+                RoomNo = reservation.Room.RoomNo,
+                Date = reservation.Date,
+                CheckInDate = reservation.CheckInDate,
+                CheckOutDate = null
+            };
+          
+            if (CheckIfRoomExist(reservation.Room.RoomNo, reservation) == null || CheckIfCustomerExist(reservation.Customer.Id, reservation) == null)
+            {
+                return null;
+            }
+        
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString); 
+            const string insertQuery = "UPDATE Hotel.Reservation SET checkInDate = @checkInDate WHERE id = @id";
+            database.Execute(insertQuery, reservationDao);
+
+            return reservation;
+        }
+        
+        public Models.Reservation CheckOut(int reservationId, Models.Reservation reservation)
+        {
+            var reservationDao = new ReservationDAO()
+            {
+                Id = reservationId,
+                CustomerId = reservation.Customer.Id,
+                RoomNo = reservation.Room.RoomNo,
+                Date = reservation.Date,
+                CheckInDate = reservation.CheckInDate,
+                CheckOutDate = reservation.CheckOutDate
+            };
+          
+            if (CheckIfRoomExist(reservation.Room.RoomNo, reservation) == null || CheckIfCustomerExist(reservation.Customer.Id, reservation) == null)
+            {
+                return null;
+            }
+        
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString); 
+            const string insertQuery = "UPDATE Hotel.Reservation SET checkOutDate = @checkOutDate WHERE id = @id";
+            database.Execute(insertQuery, reservationDao);
+
+            return reservation;
         }
         
         public Models.Reservation DeleteReservation(int reservationId)

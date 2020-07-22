@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Hotel.Domain;
 using Microsoft.AspNetCore.Http;
@@ -34,7 +35,7 @@ namespace Hotel.Controllers
         {
             return _reservation.GetReservations(roomNo);
         }
-
+        
         [HttpGet("{reservationId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -64,6 +65,60 @@ namespace Hotel.Controllers
             }
 
             return _reservation.DeleteReservation(reservationId);
+        }
+        
+        [HttpPut("{reservationId}/checkIn")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<Models.Reservation> CheckIn(int reservationId, Models.Reservation updatedReservation)
+        {
+            try
+            {
+                var reservation = _reservation.GetReservationById(reservationId);
+                if (updatedReservation.Id != reservationId)
+                {
+                    return BadRequest();
+                }
+
+                if (reservation == null)
+                {
+                    return NotFound();
+                }
+
+                return _reservation.CheckIn(reservationId, updatedReservation);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Internal server error: {e}");
+            }
+        }
+        
+        [HttpPut("{reservationId}/checkOut")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<Models.Reservation> CheckOut(int reservationId, Models.Reservation updatedReservation)
+        {
+            try
+            {
+                var reservation = _reservation.GetReservationById(reservationId);
+                if (updatedReservation.Id != reservationId)
+                {
+                    return BadRequest();
+                }
+
+                if (reservation == null)
+                {
+                    return NotFound();
+                }
+
+                return _reservation.CheckOut(reservationId, updatedReservation);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Internal server error: {e}");
+            }
         }
     }
 }

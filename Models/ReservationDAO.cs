@@ -9,7 +9,7 @@ namespace Hotel.Models
         public int CustomerId { set; get; }
         public int RoomNo { set; get; }
         public DateTime Date { set; get; }
-        public DateTime CheckInDate { set; get; }
-        public DateTime CheckOutDate { set; get; }
+        public DateTime? CheckInDate { set; get; }
+        public DateTime? CheckOutDate { set; get; }
     }
 }
