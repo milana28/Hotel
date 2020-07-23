@@ -16,6 +16,7 @@ namespace Hotel.Domain
         List<Models.Reservation> GetReservations(int? roomNo);
         Models.Reservation CheckIn(int reservationId, Models.Reservation reservation);
         Models.Reservation CheckOut(int reservationId, Models.Reservation reservation);
+        Models.Reservation TransformDaoToBusinessLogicReservation(ReservationDAO reservationDao);
     }
     
     public class Reservation : IReservation
@@ -128,6 +129,27 @@ namespace Hotel.Domain
             return roomNo == null ? GetAll() : GeReservationByRoom(roomNo);
         }
         
+        public Models.Reservation TransformDaoToBusinessLogicReservation(ReservationDAO reservationDao)
+        {
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+            
+            const string roomQuery = "SELECT * FROM Hotel.Room WHERE roomNo = @roomNo";
+            var room = database.QuerySingle<Models.Room>(roomQuery, new {roomNo = reservationDao.RoomNo});
+            
+            const string customerQuery = "SELECT * FROM Hotel.Customer WHERE id = @customerId";
+            var customer = database.QuerySingle<Models.Customer>(customerQuery, new {customerId = reservationDao.CustomerId});
+        
+            return new Models.Reservation()
+            {
+                Id = reservationDao.Id,
+                Customer = customer,
+                Room = room,
+                Date = reservationDao.Date, 
+                CheckInDate = reservationDao.CheckInDate,
+                CheckOutDate = reservationDao.CheckOutDate
+            };
+        }
+        
         private List<Models.Reservation> GetAll()
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
@@ -150,28 +172,6 @@ namespace Hotel.Domain
             reservationsDao.ForEach(r => reservations.Add(TransformDaoToBusinessLogicReservation(r)));
             
             return reservations;
-        }
-        
-        
-        private Models.Reservation TransformDaoToBusinessLogicReservation(ReservationDAO reservationDao)
-        {
-            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            
-            const string roomQuery = "SELECT * FROM Hotel.Room WHERE roomNo = @roomNo";
-            var room = database.QuerySingle<Models.Room>(roomQuery, new {roomNo = reservationDao.RoomNo});
-            
-            const string customerQuery = "SELECT * FROM Hotel.Customer WHERE id = @customerId";
-            var customer = database.QuerySingle<Models.Customer>(customerQuery, new {customerId = reservationDao.CustomerId});
-        
-            return new Models.Reservation()
-            {
-                Id = reservationDao.Id,
-                Customer = customer,
-                Room = room,
-                Date = reservationDao.Date, 
-                CheckInDate = reservationDao.CheckInDate,
-                CheckOutDate = reservationDao.CheckOutDate
-            };
         }
 
         private Models.Room CheckIfRoomExist(int roomNo, Models.Reservation reservation)

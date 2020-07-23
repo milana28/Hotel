@@ -23,6 +23,9 @@ namespace Hotel
             services.AddSingleton<ICustomer, Customer>();
             services.AddSingleton<IReservation, Reservation>();
             services.AddSingleton<IRoom, Room>();
+            services.AddSingleton<IFood, Food>();
+            services.AddSingleton<IRoomService, RoomService>();
+            services.AddSingleton<IRoomServiceFood, RoomServiceFood>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
