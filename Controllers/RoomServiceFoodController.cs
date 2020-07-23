@@ -21,9 +21,9 @@ namespace Hotel.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<List<RoomService_Food>> GetAll()
+        public ActionResult<List<RoomService_Food>> GetRoomServiceFood([FromQuery(Name = "room")] int? roomNo)
         {
-            return _roomServiceFood.GetAll();
+            return _roomServiceFood.GetRoomServiceFood(roomNo);
         }
         
         [HttpGet("{id}")] 

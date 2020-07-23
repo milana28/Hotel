@@ -150,17 +150,6 @@ namespace Hotel.Domain
             };
         }
         
-        private List<Models.Reservation> GetAll()
-        {
-            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            var reservationsDao = database.Query<ReservationDAO>("SELECT * FROM Hotel.Reservation").ToList();
-            var reservations = new List<Models.Reservation>();
-            
-            reservationsDao.ForEach(r => reservations.Add(TransformDaoToBusinessLogicReservation(r)));
-
-            return reservations;
-        }
-        
         private List<Models.Reservation> GeReservationByRoom(int? roomNo)
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
@@ -171,6 +160,17 @@ namespace Hotel.Domain
             var reservations = new List<Models.Reservation>();
             reservationsDao.ForEach(r => reservations.Add(TransformDaoToBusinessLogicReservation(r)));
             
+            return reservations;
+        }
+        
+        private List<Models.Reservation> GetAll()
+        {
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+            var reservationsDao = database.Query<ReservationDAO>("SELECT * FROM Hotel.Reservation").ToList();
+            var reservations = new List<Models.Reservation>();
+            
+            reservationsDao.ForEach(r => reservations.Add(TransformDaoToBusinessLogicReservation(r)));
+
             return reservations;
         }
 
