@@ -1,0 +1,11 @@
+namespace Hotel.Models
+{
+    public class BillDAO
+    {
+        public int Id { set; get; }
+        public int RoomServiceFoodId { set; get; }
+        public float PriceOfRoom { set; get; }
+        public float PriceOfRoomService { set; get; }
+        public float TotalPrice { set; get; }
+    }
+}
