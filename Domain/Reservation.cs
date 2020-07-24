@@ -203,6 +203,10 @@ namespace Hotel.Domain
         private int GenerateReservationId()
         {
             var reservations = GetAll();
+            if (reservations.Count == 0)
+            {
+                return 1;
+            }
             var idList = new List<int>();
             reservations.ForEach(r => idList.Add(r.Id));
             var last = idList.Max();

@@ -67,6 +67,10 @@ namespace Hotel.Domain
         private int GenerateCustomerId()
         {
             var customers = GetAll();
+            if (customers.Count == 0)
+            {
+                return 1;
+            }
             var idList = new List<int>();
             customers.ForEach(c => idList.Add(c.Id));
             var last = idList.Max();
