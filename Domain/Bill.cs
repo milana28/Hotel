@@ -36,11 +36,11 @@ namespace Hotel.Domain
                 PriceOfRoomService = bill.PriceOfRoomService,
                 TotalPrice = bill.TotalPrice
             };
-            //
-            // if (CheckIfRoomServiceFoodExist(bill.RoomServiceFoodId, bill) == null)
-            // {
-            //     return null;
-            // }
+            
+            if (CheckIfReservationExist(bill) == null)
+            {
+                return null;
+            }
             
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             const string insertQuery =
@@ -132,6 +132,23 @@ namespace Hotel.Domain
                                           r.Id == bill.RoomServiceFoodId && r.Food == bill.Order && r.RoomService.ReservationId == bill.Reservation.Id);
         
             return !roomServiceFoodList.Any() ? null : roomServiceFood;
+        }
+        
+        private Models.Reservation CheckIfReservationExist(Models.Bill bill)
+        {
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+            var reservation = bill.Reservation;
+            var reservations = database.Query<Models.Reservation>("SELECT * FROM Hotel.Reservation").ToList();
+
+            var reservationsList = reservations.Where(r =>
+                r.Id == reservation.Id && 
+                r.Customer == reservation.Customer && 
+                r.Room == reservation.Room && 
+                r.Date.Equals(reservation.Date) && 
+                r.CheckInDate.Equals(reservation.CheckInDate) && 
+                r.CheckOutDate.Equals(reservation.CheckOutDate));
+        
+            return !reservationsList.Any() ? null : reservation;
         }
         
         private int GenerateBillId()
