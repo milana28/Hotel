@@ -13,7 +13,7 @@ namespace Hotel.Domain
         Models.Reservation CreateReservation(Models.Reservation reservation);
         Models.Reservation DeleteReservation(int guestId);
         Models.Reservation GetReservationById(int id);
-        List<Models.Reservation> GetReservations(int? roomNo);
+        List<Models.Reservation> GetReservations(int? roomNo, string? name);
         Models.Reservation CheckIn(int reservationId, Models.Reservation reservation);
         Models.Reservation CheckOut(int reservationId, Models.Reservation reservation);
         Models.Reservation TransformDaoToBusinessLogicReservation(ReservationDAO reservationDao);
@@ -124,8 +124,13 @@ namespace Hotel.Domain
         }
 
 
-        public List<Models.Reservation> GetReservations(int? roomNo)
+        public List<Models.Reservation> GetReservations(int? roomNo, string? name)
         {
+            if (name != null)
+            {
+                return GeReservationByCustomerName(name);
+            }
+            
             return roomNo == null ? GetAll() : GeReservationByRoom(roomNo);
         }
         
@@ -156,6 +161,19 @@ namespace Hotel.Domain
             const string sql = "SELECT * FROM Hotel.Reservation WHERE roomNo = @number";
             
             var reservationsDao = database.Query<ReservationDAO>(sql, new {number = roomNo}).ToList();
+           
+            var reservations = new List<Models.Reservation>();
+            reservationsDao.ForEach(r => reservations.Add(TransformDaoToBusinessLogicReservation(r)));
+            
+            return reservations;
+        }
+        
+        private List<Models.Reservation> GeReservationByCustomerName(string? name)
+        {
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+            const string sql = "SELECT r.* FROM Hotel.Reservation as r LEFT JOIN Hotel.Customer as c ON r.CustomerId = c.Id WHERE c.Name = @customerName";
+            
+            var reservationsDao = database.Query<ReservationDAO>(sql, new {customerName = name}).ToList();
            
             var reservations = new List<Models.Reservation>();
             reservationsDao.ForEach(r => reservations.Add(TransformDaoToBusinessLogicReservation(r)));

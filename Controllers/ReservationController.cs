@@ -31,9 +31,9 @@ namespace Hotel.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<List<Models.Reservation>> GetCustomers([FromQuery(Name = "room")] int? roomNo)
+        public ActionResult<List<Models.Reservation>> GetCustomers([FromQuery(Name = "room")] int? roomNo, [FromQuery(Name = "customerName")] string? name)
         {
-            return _reservation.GetReservations(roomNo);
+            return _reservation.GetReservations(roomNo, name);
         }
         
         [HttpGet("{reservationId}")]
