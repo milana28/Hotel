@@ -15,6 +15,7 @@ namespace Hotel.Domain
         RoomService_Food GetRoomServiceFoodById(int id);
         RoomService_Food TransformDaoToBusinessLogicRoomServiceFood(RoomService_FoodDAO roomServiceFoodDao);
         List<Models.Food> GetFoodForRoomService(int roomServiceId);
+        RoomService_Food CreateRoomServiceFood(RoomService_Food roomServiceFood);
     }
     
     public class RoomServiceFood : IRoomServiceFood
@@ -23,12 +24,17 @@ namespace Hotel.Domain
         private readonly IRoomService _roomService;
         private readonly IFood _food;
         private readonly IReservation _reservation;
-
+        
         public RoomServiceFood(IRoomService roomService, IFood food, IReservation reservation)
         {
             _roomService = roomService;
             _food = food;
             _reservation = reservation;
+        }
+
+        public RoomService_Food CreateRoomServiceFood(RoomService_Food roomServiceFood)
+        {
+            return roomServiceFood;
         }
 
         public List<RoomService_Food> GetRoomServiceFood(int? roomNo)
@@ -69,7 +75,7 @@ namespace Hotel.Domain
             
             return roomServiceFood.Select(r => _food.GetFoodById(r.FoodId)).ToList();
         }
-
+        
         private List<RoomService_Food> GetAll()
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);

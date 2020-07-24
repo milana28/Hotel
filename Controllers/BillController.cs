@@ -29,9 +29,24 @@ namespace Hotel.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<List<Models.Bill>> GetAll()
+        public ActionResult<List<Models.Bill>> GetAll([FromQuery(Name = "reservationId")] int? reservationId)
         {
-            return _bill.GetAll();
+            return _bill.GetBills(reservationId);
+        }
+        
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<Models.Bill> GetBillById(int id)
+        {
+            var bill = _bill.GetBillById(id);
+            if (bill == null)
+            {
+                return NotFound();
+            }
+
+            return bill;
         }
     }
 }

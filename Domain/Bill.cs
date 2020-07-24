@@ -10,7 +10,8 @@ namespace Hotel.Domain
     public interface IBill
     {
         Models.Bill CreateBill(Models.Bill bill);
-        List<Models.Bill> GetAll();
+        List<Models.Bill> GetBills(int? reservationId);
+        Models.Bill GetBillById(int id);
     }
     
     public class Bill : IBill
@@ -35,6 +36,11 @@ namespace Hotel.Domain
                 PriceOfRoomService = bill.PriceOfRoomService,
                 TotalPrice = bill.TotalPrice
             };
+            //
+            // if (CheckIfRoomServiceFoodExist(bill.RoomServiceFoodId, bill) == null)
+            // {
+            //     return null;
+            // }
             
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             const string insertQuery =
@@ -43,8 +49,22 @@ namespace Hotel.Domain
             
             return TransformDaoToBusinessLogicBill(billDao);
         }
+        
+        public List<Models.Bill> GetBills(int? reservationId)
+        {
+            return reservationId == null ? GetAll() : GetBillByReservationId(reservationId);
+        }
 
-        public List<Models.Bill> GetAll()
+        public Models.Bill GetBillById(int id)
+        {
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+            const string sql = "SELECT * FROM Hotel.Bill WHERE id = @billId";
+            var billDao = database.QuerySingle<BillDAO>(sql, new {billId = id});
+
+            return TransformDaoToBusinessLogicBill(billDao);
+        }
+        
+        private List<Models.Bill> GetAll()
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             var billDao = database.Query<BillDAO>("SELECT * FROM Hotel.Bill").ToList();
@@ -55,11 +75,40 @@ namespace Hotel.Domain
             return bills;
         }
         
+        private List<Models.Bill> GetBillByReservationId(int? id)
+        {
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+            var roomServiceFoodList = new List<RoomService_FoodDAO>();
+            var billDaoList = new List<BillDAO>();
+            var billList = new List<Models.Bill>();
+            
+            const string roomServiceQuery = "SELECT * FROM Hotel.RoomService WHERE reservationId = @reservationId";
+            var roomServices = database.Query<RoomServiceDAO>(roomServiceQuery, new {reservationId = id}).ToList();
+            
+            roomServices.ForEach(rs =>
+            {
+                using IDbConnection connection = new SqlConnection(DatabaseConnectionString);
+                const string roomServiceFoodQuery = "SELECT * FROM Hotel.RoomService_Food WHERE roomServiceId = @roomServiceId";
+                roomServiceFoodList.Add(connection.QuerySingle<RoomService_FoodDAO>(roomServiceFoodQuery, new {roomServiceId = rs.Id}));
+            });
+            
+            roomServiceFoodList.ForEach(rf =>
+            {
+                using IDbConnection conn = new SqlConnection(DatabaseConnectionString);
+                const string billQuery = "SELECT * FROM Hotel.Bill WHERE roomServiceFoodId = @roomServiceFoodId";
+                billDaoList.Add(conn.QuerySingle<BillDAO>(billQuery, new {roomServiceFoodId = rf.Id}));
+            });
+            
+            billDaoList.ForEach(b => billList.Add(TransformDaoToBusinessLogicBill(b)));
+
+            return billList;
+        }
+        
         private Models.Bill TransformDaoToBusinessLogicBill(BillDAO billDao)
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             
-            const string roomServiceFoodQuery = "SELECT * FROM Hotel.roomService_food WHERE id = @id";
+            const string roomServiceFoodQuery = "SELECT * FROM Hotel.RoomService_Food WHERE id = @id";
             var roomServiceFoodDao = database.QuerySingle<RoomService_FoodDAO>(roomServiceFoodQuery, new {id = billDao.RoomServiceFoodId});
             
             var roomServiceFood = _roomServiceFood.TransformDaoToBusinessLogicRoomServiceFood(roomServiceFoodDao);
@@ -76,6 +125,22 @@ namespace Hotel.Domain
                 PriceOfRoomService = billDao.PriceOfRoomService,
                 TotalPrice = billDao.TotalPrice
             };
+        }
+        
+        private RoomService_Food CheckIfRoomServiceFoodExist(int roomServiceFoodId, Models.Bill bill)
+        {
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+            
+            var allRoomServiceFood = new List<RoomService_Food>();
+            var roomServiceFood = _roomServiceFood.GetRoomServiceFoodById(roomServiceFoodId);
+            
+            var allRoomServiceFoodDao = database.Query<RoomService_FoodDAO>("SELECT * FROM Hotel.RoomService_Food").ToList();
+            allRoomServiceFoodDao.ForEach(rs => allRoomServiceFood.Add(_roomServiceFood.TransformDaoToBusinessLogicRoomServiceFood(rs)));
+
+            var roomServiceFoodList = allRoomServiceFood.Where(r =>
+                                          r.Id == bill.RoomServiceFoodId && r.Food == bill.Order && r.RoomService.ReservationId == bill.Reservation.Id);
+        
+            return !roomServiceFoodList.Any() ? null : roomServiceFood;
         }
         
         private int GenerateBillId()
