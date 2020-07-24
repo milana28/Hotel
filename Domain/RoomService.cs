@@ -5,12 +5,14 @@ using System.Data.SqlClient;
 using System.Linq;
 using Dapper;
 using Hotel.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hotel.Domain
 {
     public interface IRoomService
     {
         Models.RoomService GetRoomServiceById(int id);
+        List<Models.RoomService> GetAll();
     }
     
     public class RoomService : IRoomService
@@ -21,6 +23,18 @@ namespace Hotel.Domain
         public RoomService(IReservation reservation)
         {
             _reservation = reservation;
+        }
+
+        public List<Models.RoomService> GetAll()
+        {
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+            var roomServicesDao = database.Query<RoomServiceDAO>("SELECT * FROM Hotel.RoomService").ToList();
+            
+            var roomServices = new List<Models.RoomService>();
+            
+            roomServicesDao.ForEach(r => roomServices.Add(TransformDaoToBusinessLogicRoomService(r)));
+
+            return roomServices;
         }
 
         public Models.RoomService GetRoomServiceById(int id)

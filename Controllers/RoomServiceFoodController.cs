@@ -17,6 +17,15 @@ namespace Hotel.Controllers
             _roomServiceFood = roomServiceFood;
         }
         
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status405MethodNotAllowed)]
+        public ActionResult<RoomService_Food> CreateReservation(RoomService_Food roomServiceFood)
+        {
+            return _roomServiceFood.CreateRoomServiceFood(roomServiceFood);
+        }
+        
         [HttpGet] 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

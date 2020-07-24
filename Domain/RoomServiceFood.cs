@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -31,6 +32,37 @@ namespace Hotel.Domain
 
         public RoomService_Food CreateRoomServiceFood(RoomService_Food roomServiceFood)
         {
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+            var roomServices = database.Query<Models.RoomService>("SELECT * FROM Hotel.RoomService").ToList();
+            if (!roomServices.Contains(roomServiceFood.RoomService))
+            {
+                var roomServiceDao = new RoomServiceDAO()
+                {
+                    Id = roomServiceFood.Id,
+                    ReservationId = roomServiceFood.RoomService.ReservationId,
+                    Date = DateTime.Now
+                };
+                
+                const string roomServiceQuery = "INSERT INTO Hotel.RoomService VALUES (@reservationId, @date)";
+                database.Execute(roomServiceQuery, roomServiceDao);
+            }
+           
+            var foodList = roomServiceFood.Food;
+            foodList.ForEach(f =>
+                {
+                    var roomServiceFoodDao = new RoomService_FoodDAO()
+                    {
+                        Id = GenerateRoomServiceFoodId(),
+                        RoomServiceId = roomServiceFood.RoomService.Id,
+                        FoodId = f.Id
+                    };
+
+                    using IDbConnection connection = new SqlConnection(DatabaseConnectionString); 
+                    const string insertQuery = "INSERT INTO Hotel.RoomService_Food VALUES (@roomServiceId, @foodId)";
+                    connection.Execute(insertQuery, roomServiceFoodDao);
+                });
+            
+            
             return roomServiceFood;
         }
 
@@ -127,6 +159,34 @@ namespace Hotel.Domain
                 });
                 
             return roomServiceFoodList;
+        }
+        
+        private int GenerateRoomServiceFoodId()
+        {
+            var roomServiceFood = GetAll();
+            if (roomServiceFood.Count == 0)
+            {
+                return 1;
+            }
+            var idList = new List<int>();
+            roomServiceFood.ForEach(r => idList.Add(r.Id));
+            var last = idList.Max();
+
+            return last + 1;
+        }
+        
+        private int GenerateRoomServiceId()
+        {
+            var roomServices = _roomService.GetAll();
+            if (roomServices.Count == 0)
+            {
+                return 1;
+            }
+            var idList = new List<int>();
+            roomServices.ForEach(r => idList.Add(r.Id));
+            var last = idList.Max();
+
+            return last + 1;
         }
     }
 }
