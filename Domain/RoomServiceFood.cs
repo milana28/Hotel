@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using Dapper;
@@ -24,13 +22,11 @@ namespace Hotel.Domain
         private const string DatabaseConnectionString = "Server=localhost;Database=hotel;User Id=sa;Password=yourStrong(!)Password;";
         private readonly IRoomService _roomService;
         private readonly IFood _food;
-        private readonly IReservation _reservation;
-        
-        public RoomServiceFood(IRoomService roomService, IFood food, IReservation reservation)
+
+        public RoomServiceFood(IRoomService roomService, IFood food)
         {
             _roomService = roomService;
             _food = food;
-            _reservation = reservation;
         }
 
         public RoomService_Food CreateRoomServiceFood(RoomService_Food roomServiceFood)
