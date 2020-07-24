@@ -34,6 +34,7 @@ namespace Hotel.Domain
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             var roomServices = database.Query<Models.RoomService>("SELECT * FROM Hotel.RoomService").ToList();
+            
             if (!roomServices.Contains(roomServiceFood.RoomService))
             {
                 var roomServiceDao = new RoomServiceDAO()
@@ -50,6 +51,11 @@ namespace Hotel.Domain
             var foodList = roomServiceFood.Food;
             foodList.ForEach(f =>
                 {
+                    if (CheckIfFoodExist(f.Id, f) == null)
+                    {
+                        return;
+                    }
+                    
                     var roomServiceFoodDao = new RoomService_FoodDAO()
                     {
                         Id = GenerateRoomServiceFoodId(),
@@ -59,9 +65,9 @@ namespace Hotel.Domain
 
                     using IDbConnection connection = new SqlConnection(DatabaseConnectionString); 
                     const string insertQuery = "INSERT INTO Hotel.RoomService_Food VALUES (@roomServiceId, @foodId)";
+                    
                     connection.Execute(insertQuery, roomServiceFoodDao);
                 });
-            
             
             return roomServiceFood;
         }
@@ -160,6 +166,18 @@ namespace Hotel.Domain
                 
             return roomServiceFoodList;
         }
+
+        private Models.Food CheckIfFoodExist(int foodId, Models.Food roomServiceFood)
+        {
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+            var food = database.Query<Models.Food>("SELECT * FROM Hotel.Food").ToList();
+            var foodById = _food.GetFoodById(foodId);
+        
+            var foodList = 
+                food.Where(f =>  f.Id == roomServiceFood.Id && f.Name == roomServiceFood.Name && f.Price == roomServiceFood.Price);
+        
+            return !foodList.Any() ? null : foodById;
+        }
         
         private int GenerateRoomServiceFoodId()
         {
@@ -170,20 +188,6 @@ namespace Hotel.Domain
             }
             var idList = new List<int>();
             roomServiceFood.ForEach(r => idList.Add(r.Id));
-            var last = idList.Max();
-
-            return last + 1;
-        }
-        
-        private int GenerateRoomServiceId()
-        {
-            var roomServices = _roomService.GetAll();
-            if (roomServices.Count == 0)
-            {
-                return 1;
-            }
-            var idList = new List<int>();
-            roomServices.ForEach(r => idList.Add(r.Id));
             var last = idList.Max();
 
             return last + 1;
