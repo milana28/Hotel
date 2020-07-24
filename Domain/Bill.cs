@@ -78,19 +78,10 @@ namespace Hotel.Domain
         private List<Models.Bill> GetBillByReservationId(int? id)
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            var roomServiceFoodList = new List<RoomService_FoodDAO>();
             var billDaoList = new List<BillDAO>();
             var billList = new List<Models.Bill>();
-            
-            const string roomServiceQuery = "SELECT * FROM Hotel.RoomService WHERE reservationId = @reservationId";
-            var roomServices = database.Query<RoomServiceDAO>(roomServiceQuery, new {reservationId = id}).ToList();
-            
-            roomServices.ForEach(rs =>
-            {
-                using IDbConnection connection = new SqlConnection(DatabaseConnectionString);
-                const string roomServiceFoodQuery = "SELECT * FROM Hotel.RoomService_Food WHERE roomServiceId = @roomServiceId";
-                roomServiceFoodList.Add(connection.QuerySingle<RoomService_FoodDAO>(roomServiceFoodQuery, new {roomServiceId = rs.Id}));
-            });
+
+            var roomServiceFoodList = _roomServiceFood.GetRoomServiceFoodByReservationId(id);
             
             roomServiceFoodList.ForEach(rf =>
             {

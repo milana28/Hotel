@@ -16,6 +16,7 @@ namespace Hotel.Domain
         RoomService_Food TransformDaoToBusinessLogicRoomServiceFood(RoomService_FoodDAO roomServiceFoodDao);
         List<Models.Food> GetFoodForRoomService(int roomServiceId);
         RoomService_Food CreateRoomServiceFood(RoomService_Food roomServiceFood);
+        List<RoomService_Food> GetRoomServiceFoodByReservationId(int? id);
     }
     
     public class RoomServiceFood : IRoomServiceFood
@@ -74,6 +75,28 @@ namespace Hotel.Domain
             var roomServiceFood = database.Query<RoomService_FoodDAO>(sql, new {id = roomServiceId}).ToList();
             
             return roomServiceFood.Select(r => _food.GetFoodById(r.FoodId)).ToList();
+        }
+        
+        public List<RoomService_Food> GetRoomServiceFoodByReservationId(int? id)
+        {
+            var roomServiceFoodList = new List<RoomService_Food>();
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+                
+            const string roomServiceSql =
+                "SELECT rs.* FROM Hotel.RoomService AS rs LEFT JOIN Hotel.Reservation AS r ON rs.reservationId = r.id WHERE r.id = @reservationId";
+            var roomServices = database.Query<RoomServiceDAO>(roomServiceSql, new {reservationId = id}).ToList();
+                
+
+            roomServices.ForEach(rs =>
+            { 
+                using IDbConnection connection = new SqlConnection(DatabaseConnectionString);
+                const string sql = "SELECT * FROM Hotel.RoomService_Food WHERE roomServiceId = @id"; 
+                var roomServiceFood = connection.QuerySingle<RoomService_FoodDAO>(sql, new {id = rs.Id}); 
+                    
+                roomServiceFoodList.Add(TransformDaoToBusinessLogicRoomServiceFood(roomServiceFood)); 
+            });
+                
+            return roomServiceFoodList;
         }
         
         private List<RoomService_Food> GetAll()
