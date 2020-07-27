@@ -6,7 +6,7 @@ namespace Hotel.Models
     {
         public int Id { set; get; }
         public Reservation Reservation { set; get; }
-        public int RoomServiceFoodId { set; get; }
+        public int RoomServiceId { set; get; }
         public List<Food> Order { set; get; }
         public float PriceOfRoom { set; get; }
         public float PriceOfRoomService { set; get; }

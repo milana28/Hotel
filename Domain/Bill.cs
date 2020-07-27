@@ -19,12 +19,14 @@ namespace Hotel.Domain
     {
         private const string DatabaseConnectionString = "Server=localhost;Database=hotel;User Id=sa;Password=yourStrong(!)Password;";
         private readonly IRoomServiceFood _roomServiceFood;
+        private readonly IRoomService _roomService;
         private readonly IReservation _reservation;
 
-        public Bill(IRoomServiceFood roomServiceFood, IReservation reservation)
+        public Bill(IRoomServiceFood roomServiceFood, IReservation reservation, IRoomService roomService)
         {
             _roomServiceFood = roomServiceFood;
             _reservation = reservation;
+            _roomService = roomService;
         }
 
         public Models.Bill CreateBill(Models.Bill bill)
@@ -32,7 +34,7 @@ namespace Hotel.Domain
             var billDao = new BillDao()
             {
                 Id = GenerateBillId(),
-                RoomServiceFoodId = bill.RoomServiceFoodId,
+                RoomServiceId = bill.RoomServiceId,
                 PriceOfRoom = bill.PriceOfRoom,
                 PriceOfRoomService = bill.PriceOfRoomService,
                 TotalPrice = bill.TotalPrice
@@ -45,7 +47,7 @@ namespace Hotel.Domain
             
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             const string insertQuery =
-                "INSERT INTO Hotel.Bill VALUES (@roomServiceFoodId, @priceOfRoom, @priceOfRoomService, @totalPrice)";
+                "INSERT INTO Hotel.Bill VALUES (@roomServiceId, @priceOfRoom, @priceOfRoomService, @totalPrice)";
             database.Execute(insertQuery, billDao);
             
             return TransformDaoToBusinessLogicBill(billDao);
@@ -99,19 +101,15 @@ namespace Hotel.Domain
         private Models.Bill TransformDaoToBusinessLogicBill(BillDao billDao)
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            
-            const string roomServiceFoodQuery = "SELECT * FROM Hotel.RoomService_Food WHERE id = @id";
-            var roomServiceFoodDao = database.QuerySingle<RoomServiceFoodDao>(roomServiceFoodQuery, new {id = billDao.RoomServiceFoodId});
-            
-            var roomServiceFood = _roomServiceFood.TransformDaoToBusinessLogicRoomServiceFood(roomServiceFoodDao);
-            var reservation = _reservation.GetReservationById(roomServiceFood.RoomService.ReservationId);
-            var food = _roomServiceFood.GetFoodForRoomService(roomServiceFoodDao.RoomServiceId);
+            var roomService = _roomService.GetRoomServiceById(billDao.RoomServiceId);
+            var reservation = _reservation.GetReservationById(roomService.ReservationId);
+            var food = _roomServiceFood.GetFoodForRoomService(billDao.RoomServiceId);
             
             return new Models.Bill()
             {
                 Id = billDao.Id,
                 Reservation = reservation,
-                RoomServiceFoodId = billDao.RoomServiceFoodId,
+                RoomServiceId = billDao.RoomServiceId,
                 Order = food,
                 PriceOfRoom = billDao.PriceOfRoom,
                 PriceOfRoomService = billDao.PriceOfRoomService,
@@ -119,21 +117,21 @@ namespace Hotel.Domain
             };
         }
         
-        private Models.RoomServiceFood CheckIfRoomServiceFoodExist(int roomServiceFoodId, Models.Bill bill)
-        {
-            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            
-            var allRoomServiceFood = new List<Models.RoomServiceFood>();
-            var roomServiceFood = _roomServiceFood.GetRoomServiceFoodById(roomServiceFoodId);
-            
-            var allRoomServiceFoodDao = database.Query<RoomServiceFoodDao>("SELECT * FROM Hotel.RoomService_Food").ToList();
-            allRoomServiceFoodDao.ForEach(rs => allRoomServiceFood.Add(_roomServiceFood.TransformDaoToBusinessLogicRoomServiceFood(rs)));
-
-            var roomServiceFoodList = allRoomServiceFood.Where(r =>
-                                          r.Id == bill.RoomServiceFoodId && r.Food == bill.Order && r.RoomService.ReservationId == bill.Reservation.Id);
-        
-            return !roomServiceFoodList.Any() ? null : roomServiceFood;
-        }
+        // private Models.RoomServiceFood CheckIfRoomServiceFoodExist(int roomServiceFoodId, Models.Bill bill)
+        // {
+        //     using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+        //     
+        //     var allRoomServiceFood = new List<Models.RoomServiceFood>();
+        //     var roomServiceFood = _roomServiceFood.GetRoomServiceFoodById(roomServiceFoodId);
+        //     
+        //     var allRoomServiceFoodDao = database.Query<RoomServiceFoodDao>("SELECT * FROM Hotel.RoomService_Food").ToList();
+        //     allRoomServiceFoodDao.ForEach(rs => allRoomServiceFood.Add(_roomServiceFood.TransformDaoToBusinessLogicRoomServiceFood(rs)));
+        //
+        //     var roomServiceFoodList = allRoomServiceFood.Where(r =>
+        //                                   r.Id == bill.RoomServiceFoodId && CheckIfFoodIsTheSame(r.RoomService.Id, bill.Order) && r.RoomService.ReservationId == bill.Reservation.Id);
+        //
+        //     return !roomServiceFoodList.Any() ? null : roomServiceFood;
+        // }
         
         private Models.Reservation CheckIfReservationExist(Models.Bill bill)
         {
@@ -162,6 +160,30 @@ namespace Hotel.Domain
         private static bool CheckIfRoomsAreTheSame(Models.Room firstRoom, Models.Room secondRoom)
         {
             return firstRoom.RoomNo == secondRoom.RoomNo && firstRoom.Location == secondRoom.Location;
+        }
+        
+        private bool CheckIfFoodIsTheSame(int roomServiceId, List<Models.Food> order)
+        {
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+            var food = _roomServiceFood.GetFoodForRoomService(roomServiceId);
+            var isTrue = new bool();
+            
+            food.ForEach(f =>
+            {
+                order.ForEach(sf =>
+                {
+                    if (f.Id == sf.Id && f.Name == sf.Name)
+                    {
+                        isTrue = true;
+                    }
+                    else
+                    {
+                        isTrue = false;
+                    }
+                });
+            });
+
+            return isTrue;
         }
         
         private int GenerateBillId()
