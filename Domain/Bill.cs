@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using Dapper;
 using Hotel.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hotel.Domain
 {
@@ -142,14 +143,25 @@ namespace Hotel.Domain
             reservationsDao.ForEach(el => reservations.Add(_reservation.TransformDaoToBusinessLogicReservation(el)));
 
             var reservationsList = reservations.Where(r =>
-                r.Id == bill.Reservation.Id && 
-                r.Customer == bill.Reservation.Customer && 
-                r.Room == bill.Reservation.Room && 
-                r.Date.Equals(bill.Reservation.Date) && 
-                r.CheckInDate.Equals(bill.Reservation.CheckInDate) && 
+                r.Id == bill.Reservation.Id &&
+                CheckIfCustomersAreTheSame(r.Customer,bill.Reservation.Customer) &&
+                CheckIfRoomsAreTheSame(r.Room, bill.Reservation.Room) &&
+                r.Date.Equals(bill.Reservation.Date) &&
+                r.CheckInDate.Equals(bill.Reservation.CheckInDate) &&
                 r.CheckOutDate.Equals(bill.Reservation.CheckOutDate));
-        
+            
             return !reservationsList.Any() ? null : bill.Reservation;
+        }
+
+        private static bool CheckIfCustomersAreTheSame(Models.Customer firstCustomer, Models.Customer secondCustomer)
+        {
+            return firstCustomer.Id == secondCustomer.Id && firstCustomer.Name == secondCustomer.Name &&
+                   firstCustomer.Address == secondCustomer.Address && firstCustomer.PhoneNo == secondCustomer.PhoneNo;
+        }
+
+        private static bool CheckIfRoomsAreTheSame(Models.Room firstRoom, Models.Room secondRoom)
+        {
+            return firstRoom.RoomNo == secondRoom.RoomNo && firstRoom.Location == secondRoom.Location;
         }
         
         private int GenerateBillId()
