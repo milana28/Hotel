@@ -3,7 +3,7 @@ using System.Data;
 
 namespace Hotel.Models
 {
-    public class ReservationDAO
+    public class ReservationDao
     {
         public int Id { set; get; }
         public int CustomerId { set; get; }

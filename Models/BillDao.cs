@@ -1,6 +1,6 @@
 namespace Hotel.Models
 {
-    public class BillDAO
+    public class BillDao
     {
         public int Id { set; get; }
         // public int ReservationId { set; get; }

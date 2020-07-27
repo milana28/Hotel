@@ -28,7 +28,7 @@ namespace Hotel.Domain
         public List<Models.RoomService> GetAll()
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            var roomServicesDao = database.Query<RoomServiceDAO>("SELECT * FROM Hotel.RoomService").ToList();
+            var roomServicesDao = database.Query<RoomServiceDao>("SELECT * FROM Hotel.RoomService").ToList();
             
             var roomServices = new List<Models.RoomService>();
             
@@ -42,17 +42,18 @@ namespace Hotel.Domain
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             const string sql = "SELECT * FROM Hotel.RoomService WHERE id = @roomServiceId";
 
-            var roomServiceDao = database.QuerySingle<RoomServiceDAO>(sql, new {roomServiceId = id});
+            var roomServiceDao = database.QuerySingle<RoomServiceDao>(sql, new {roomServiceId = id});
 
             return TransformDaoToBusinessLogicRoomService(roomServiceDao);
         }
 
-        private Models.RoomService TransformDaoToBusinessLogicRoomService(RoomServiceDAO roomServiceDao)
+        private Models.RoomService TransformDaoToBusinessLogicRoomService(RoomServiceDao roomServiceDao)
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             const string reservationSql = "SELECT * FROM Hotel.Reservation WHERE id = @reservationId";
+            
             var reservationDao =
-                database.QuerySingle<ReservationDAO>(reservationSql,
+                database.QuerySingle<ReservationDao>(reservationSql,
                     new {reservationId = roomServiceDao.ReservationId});
             var reservation = _reservation.TransformDaoToBusinessLogicReservation(reservationDao);
 

@@ -16,7 +16,7 @@ namespace Hotel.Domain
         List<Models.Reservation> GetReservations(int? roomNo, string? name);
         Models.Reservation CheckIn(int reservationId, Models.Reservation reservation);
         Models.Reservation CheckOut(int reservationId, Models.Reservation reservation);
-        Models.Reservation TransformDaoToBusinessLogicReservation(ReservationDAO reservationDao);
+        Models.Reservation TransformDaoToBusinessLogicReservation(ReservationDao reservationDao);
     }
     
     public class Reservation : IReservation
@@ -33,7 +33,7 @@ namespace Hotel.Domain
         
         public Models.Reservation CreateReservation(Models.Reservation reservation)
         {
-            var reservationDao = new ReservationDAO()
+            var reservationDao = new ReservationDao()
             {
                 Id = GenerateReservationId(),
                 CustomerId = reservation.Customer.Id,
@@ -57,7 +57,7 @@ namespace Hotel.Domain
         
         public Models.Reservation CheckIn(int reservationId, Models.Reservation reservation)
         {
-            var reservationDao = new ReservationDAO()
+            var reservationDao = new ReservationDao()
             {
                 Id = reservationId,
                 CustomerId = reservation.Customer.Id,
@@ -81,7 +81,7 @@ namespace Hotel.Domain
         
         public Models.Reservation CheckOut(int reservationId, Models.Reservation reservation)
         {
-            var reservationDao = new ReservationDAO()
+            var reservationDao = new ReservationDao()
             {
                 Id = reservationId,
                 CustomerId = reservation.Customer.Id,
@@ -118,7 +118,7 @@ namespace Hotel.Domain
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             const string sql = "SELECT * FROM Hotel.Reservation WHERE id = @reservationId";
             
-            var reservation = database.QuerySingle<ReservationDAO>(sql, new {reservationId = id});
+            var reservation = database.QuerySingle<ReservationDao>(sql, new {reservationId = id});
 
             return TransformDaoToBusinessLogicReservation(reservation);
         }
@@ -134,7 +134,7 @@ namespace Hotel.Domain
             return roomNo == null ? GetAll() : GeReservationByRoom(roomNo);
         }
         
-        public Models.Reservation TransformDaoToBusinessLogicReservation(ReservationDAO reservationDao)
+        public Models.Reservation TransformDaoToBusinessLogicReservation(ReservationDao reservationDao)
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             
@@ -160,7 +160,7 @@ namespace Hotel.Domain
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             const string sql = "SELECT * FROM Hotel.Reservation WHERE roomNo = @number";
             
-            var reservationsDao = database.Query<ReservationDAO>(sql, new {number = roomNo}).ToList();
+            var reservationsDao = database.Query<ReservationDao>(sql, new {number = roomNo}).ToList();
            
             var reservations = new List<Models.Reservation>();
             reservationsDao.ForEach(r => reservations.Add(TransformDaoToBusinessLogicReservation(r)));
@@ -173,7 +173,7 @@ namespace Hotel.Domain
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             const string sql = "SELECT r.* FROM Hotel.Reservation as r LEFT JOIN Hotel.Customer as c ON r.CustomerId = c.Id WHERE c.Name = @customerName";
             
-            var reservationsDao = database.Query<ReservationDAO>(sql, new {customerName = name}).ToList();
+            var reservationsDao = database.Query<ReservationDao>(sql, new {customerName = name}).ToList();
            
             var reservations = new List<Models.Reservation>();
             reservationsDao.ForEach(r => reservations.Add(TransformDaoToBusinessLogicReservation(r)));
@@ -184,7 +184,7 @@ namespace Hotel.Domain
         private List<Models.Reservation> GetAll()
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            var reservationsDao = database.Query<ReservationDAO>("SELECT * FROM Hotel.Reservation").ToList();
+            var reservationsDao = database.Query<ReservationDao>("SELECT * FROM Hotel.Reservation").ToList();
             var reservations = new List<Models.Reservation>();
             
             reservationsDao.ForEach(r => reservations.Add(TransformDaoToBusinessLogicReservation(r)));

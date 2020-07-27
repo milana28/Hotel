@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Hotel.Models
 {
-    public class RoomService_Food
+    public class RoomServiceFood
     {
         public int Id { set; get; }
         public RoomService RoomService { set; get; }

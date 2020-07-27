@@ -1,6 +1,6 @@
 namespace Hotel.Models
 {
-    public class RoomService_FoodDAO
+    public class RoomServiceFoodDao
     {
         public int Id { set; get; }
         public int RoomServiceId { set; get; }
