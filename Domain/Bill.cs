@@ -137,7 +137,9 @@ namespace Hotel.Domain
         private Models.Reservation CheckIfReservationExist(Models.Bill bill)
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            var reservations = database.Query<Models.Reservation>("SELECT * FROM Hotel.Reservation").ToList();
+            var reservationsDao = database.Query<ReservationDao>("SELECT * FROM Hotel.Reservation").ToList();
+            var reservations = new List<Models.Reservation>();
+            reservationsDao.ForEach(el => reservations.Add(_reservation.TransformDaoToBusinessLogicReservation(el)));
 
             var reservationsList = reservations.Where(r =>
                 r.Id == bill.Reservation.Id && 
