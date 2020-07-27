@@ -40,7 +40,7 @@ namespace Hotel.Domain
                 TotalPrice = bill.TotalPrice
             };
             
-            if (CheckIfReservationExist(bill) == null)
+            if (CheckIfReservationExist(bill) == null || CheckIfRoomServiceFoodExist(bill.RoomServiceId, bill) == null)
             {
                 return null;
             }
@@ -117,21 +117,22 @@ namespace Hotel.Domain
             };
         }
         
-        // private Models.RoomServiceFood CheckIfRoomServiceFoodExist(int roomServiceFoodId, Models.Bill bill)
-        // {
-        //     using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-        //     
-        //     var allRoomServiceFood = new List<Models.RoomServiceFood>();
-        //     var roomServiceFood = _roomServiceFood.GetRoomServiceFoodById(roomServiceFoodId);
-        //     
-        //     var allRoomServiceFoodDao = database.Query<RoomServiceFoodDao>("SELECT * FROM Hotel.RoomService_Food").ToList();
-        //     allRoomServiceFoodDao.ForEach(rs => allRoomServiceFood.Add(_roomServiceFood.TransformDaoToBusinessLogicRoomServiceFood(rs)));
-        //
-        //     var roomServiceFoodList = allRoomServiceFood.Where(r =>
-        //                                   r.Id == bill.RoomServiceFoodId && CheckIfFoodIsTheSame(r.RoomService.Id, bill.Order) && r.RoomService.ReservationId == bill.Reservation.Id);
-        //
-        //     return !roomServiceFoodList.Any() ? null : roomServiceFood;
-        // }
+        private Models.RoomService CheckIfRoomServiceFoodExist(int roomServiceId, Models.Bill bill)
+        {
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+            var allRoomServiceFood = new List<Models.RoomServiceFood>();
+            var roomService = _roomService.GetRoomServiceById(roomServiceId);
+            
+            const string sql = "SELECT * FROM Hotel.RoomService_Food WHERE roomServiceid = @id";
+            var allRoomServiceFoodDao = database.Query<RoomServiceFoodDao>(sql, new {id = roomServiceId}).ToList();
+            
+            allRoomServiceFoodDao.ForEach(rs => allRoomServiceFood.Add(_roomServiceFood.TransformDaoToBusinessLogicRoomServiceFood(rs)));
+        
+            var roomServiceFoodList = allRoomServiceFood.Where(r =>
+                                          r.Id == bill.RoomServiceId && CheckIfFoodIsTheSame(r.RoomService.Id, bill.Order) && r.RoomService.ReservationId == bill.Reservation.Id);
+        
+            return !roomServiceFoodList.Any() ? null : roomService;
+        }
         
         private Models.Reservation CheckIfReservationExist(Models.Bill bill)
         {
