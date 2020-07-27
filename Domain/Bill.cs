@@ -137,18 +137,17 @@ namespace Hotel.Domain
         private Models.Reservation CheckIfReservationExist(Models.Bill bill)
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            var reservation = bill.Reservation;
             var reservations = database.Query<Models.Reservation>("SELECT * FROM Hotel.Reservation").ToList();
 
             var reservationsList = reservations.Where(r =>
-                r.Id == reservation.Id && 
-                r.Customer == reservation.Customer && 
-                r.Room == reservation.Room && 
-                r.Date.Equals(reservation.Date) && 
-                r.CheckInDate.Equals(reservation.CheckInDate) && 
-                r.CheckOutDate.Equals(reservation.CheckOutDate));
+                r.Id == bill.Reservation.Id && 
+                r.Customer == bill.Reservation.Customer && 
+                r.Room == bill.Reservation.Room && 
+                r.Date.Equals(bill.Reservation.Date) && 
+                r.CheckInDate.Equals(bill.Reservation.CheckInDate) && 
+                r.CheckOutDate.Equals(bill.Reservation.CheckOutDate));
         
-            return !reservationsList.Any() ? null : reservation;
+            return !reservationsList.Any() ? null : bill.Reservation;
         }
         
         private int GenerateBillId()
