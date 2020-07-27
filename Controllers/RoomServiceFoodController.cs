@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Hotel.Domain;
-using Hotel.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

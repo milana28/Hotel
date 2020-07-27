@@ -5,8 +5,6 @@ using System.Data.SqlClient;
 using System.Linq;
 using Dapper;
 using Hotel.Models;
-using Microsoft.EntityFrameworkCore;
-
 namespace Hotel.Domain
 {
     public interface IRoomService
