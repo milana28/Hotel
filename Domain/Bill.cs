@@ -39,6 +39,14 @@ namespace Hotel.Domain
                 TotalPrice = bill.TotalPrice
             };
             
+            // {
+            //     "reservationId": 1,
+            //     "roomServiceId": 1,
+            //     "priceOfRoom": 30,
+            //     "priceOfRoomService": 20,
+            //     "totalPrice": 50
+            // }
+            
             if (CheckIfReservationExist(bill) == null || CheckIfRoomServiceFoodExist(bill.RoomServiceId, bill) == null)
             {
                 return null;

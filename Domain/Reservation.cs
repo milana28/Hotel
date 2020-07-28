@@ -35,7 +35,6 @@ namespace Hotel.Domain
         {
             var reservationDao = new ReservationDao()
             {
-                Id = GenerateReservationId(),
                 CustomerId = reservation.Customer.Id,
                 RoomNo = reservation.Room.RoomNo,
                 Date = DateTime.Now,
@@ -49,7 +48,7 @@ namespace Hotel.Domain
             }
         
             using IDbConnection database = new SqlConnection(DatabaseConnectionString); 
-            const string insertQuery = "INSERT INTO Hotel.Reservation VALUES (@customerId, @roomNo, @date, @checkInDate, @checkOutDate)";
+            const string insertQuery = "INSERT INTO Hotel.Reservation VALUES (@customerId, @roomNo, @date, @checkInDate, @checkOutDate); SELECT * FROM Hotel.Reservation WHERE id = SCOPE_IDENTITY()";
             database.Execute(insertQuery, reservationDao);
 
             return TransformDaoToBusinessLogicReservation(reservationDao);
@@ -63,7 +62,7 @@ namespace Hotel.Domain
                 CustomerId = reservation.Customer.Id,
                 RoomNo = reservation.Room.RoomNo,
                 Date = reservation.Date,
-                CheckInDate = reservation.CheckInDate,
+                CheckInDate = DateTime.Now,
                 CheckOutDate = null
             };
           
@@ -88,7 +87,7 @@ namespace Hotel.Domain
                 RoomNo = reservation.Room.RoomNo,
                 Date = reservation.Date,
                 CheckInDate = reservation.CheckInDate,
-                CheckOutDate = reservation.CheckOutDate
+                CheckOutDate = DateTime.Now
             };
           
             if (CheckIfRoomExist(reservation.Room.RoomNo, reservation) == null || CheckIfCustomerExist(reservation.Customer.Id, reservation) == null)
@@ -216,20 +215,6 @@ namespace Hotel.Domain
                 c.PhoneNo == reservation.Customer.PhoneNo);
         
             return !customerList.Any() ? null : customer;
-        }
-
-        private int GenerateReservationId()
-        {
-            var reservations = GetAll();
-            if (reservations.Count == 0)
-            {
-                return 1;
-            }
-            var idList = new List<int>();
-            reservations.ForEach(r => idList.Add(r.Id));
-            var last = idList.Max();
-
-            return last + 1;
         }
     }
 }

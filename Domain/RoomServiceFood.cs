@@ -39,12 +39,11 @@ namespace Hotel.Domain
             {
                 var roomServiceDao = new RoomServiceDao()
                 {
-                    Id = roomServiceFood.Id,
                     ReservationId = roomServiceFood.RoomService.ReservationId,
                     Date = DateTime.Now
                 };
                 
-                const string roomServiceQuery = "INSERT INTO Hotel.RoomService VALUES (@reservationId, @date)";
+                const string roomServiceQuery = "INSERT INTO Hotel.RoomService VALUES (@reservationId, @date); SELECT * FROM Hotel.RoomService WHERE id = SCOPE_IDENTITY()";
                 database.Execute(roomServiceQuery, roomServiceDao);
             }
            
@@ -58,13 +57,12 @@ namespace Hotel.Domain
                     
                     var roomServiceFoodDao = new RoomServiceFoodDao()
                     {
-                        Id = GenerateRoomServiceFoodId(),
                         RoomServiceId = roomServiceFood.RoomService.Id,
                         FoodId = f.Id
                     };
 
                     using IDbConnection connection = new SqlConnection(DatabaseConnectionString); 
-                    const string insertQuery = "INSERT INTO Hotel.RoomService_Food VALUES (@roomServiceId, @foodId)";
+                    const string insertQuery = "INSERT INTO Hotel.RoomService_Food VALUES (@roomServiceId, @foodId); SELECT * FROM Hotel.RoomService_Food WHERE id = SCOPE_IDENTITY()";
                     
                     connection.Execute(insertQuery, roomServiceFoodDao);
                 });
