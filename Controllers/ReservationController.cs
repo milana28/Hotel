@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Hotel.Domain;
+using Hotel.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,9 +23,9 @@ namespace Hotel.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status405MethodNotAllowed)]
-        public ActionResult<Models.Reservation> CreateReservation(Models.Reservation reservation)
+        public ActionResult<Models.Reservation> CreateReservation(ReservationDao reservationDao)
         {
-            return _reservation.CreateReservation(reservation);
+            return _reservation.CreateReservation(reservationDao);
         }
 
         [HttpGet]
@@ -71,22 +72,17 @@ namespace Hotel.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<Models.Reservation> CheckIn(int reservationId, Models.Reservation updatedReservation)
+        public ActionResult<Models.Reservation> CheckIn(int reservationId)
         {
             try
             {
                 var reservation = _reservation.GetReservationById(reservationId);
-                if (updatedReservation.Id != reservationId)
-                {
-                    return BadRequest();
-                }
-
                 if (reservation == null)
                 {
                     return NotFound();
                 }
 
-                return _reservation.CheckIn(reservationId, updatedReservation);
+                return _reservation.CheckIn(reservationId);
             }
             catch (Exception e)
             {
@@ -98,22 +94,17 @@ namespace Hotel.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<Models.Reservation> CheckOut(int reservationId, Models.Reservation updatedReservation)
+        public ActionResult<Models.Reservation> CheckOut(int reservationId)
         {
             try
             {
                 var reservation = _reservation.GetReservationById(reservationId);
-                if (updatedReservation.Id != reservationId)
-                {
-                    return BadRequest();
-                }
-
                 if (reservation == null)
                 {
                     return NotFound();
                 }
 
-                return _reservation.CheckOut(reservationId, updatedReservation);
+                return _reservation.CheckOut(reservationId);
             }
             catch (Exception e)
             {
