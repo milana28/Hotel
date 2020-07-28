@@ -32,7 +32,6 @@ namespace Hotel.Domain
         {
             var billDao = new BillDao()
             {
-                Id = GenerateBillId(),
                 RoomServiceId = bill.RoomServiceId,
                 PriceOfRoom = bill.PriceOfRoom,
                 PriceOfRoomService = bill.PriceOfRoomService,
@@ -54,7 +53,7 @@ namespace Hotel.Domain
             
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             const string insertQuery =
-                "INSERT INTO Hotel.Bill VALUES (@roomServiceId, @priceOfRoom, @priceOfRoomService, @totalPrice)";
+                "INSERT INTO Hotel.Bill VALUES (@roomServiceId, @priceOfRoom, @priceOfRoomService, @totalPrice); SELECT * FROM Hotel.Bill WHERE id = SCOPE_IDENTITY()";
             database.Execute(insertQuery, billDao);
             
             return TransformDaoToBusinessLogicBill(billDao);
