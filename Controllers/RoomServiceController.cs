@@ -10,12 +10,10 @@ namespace Hotel.Controllers
     [Route("[controller]")]
     public class RoomServiceController : ControllerBase
     {
-        private readonly IRoomServiceFood _roomServiceFood;
         private readonly IRoomService _roomService;
 
-        public RoomServiceController(IRoomServiceFood roomServiceFood, IRoomService roomService)
+        public RoomServiceController(IRoomService roomService)
         {
-            _roomServiceFood = roomServiceFood;
             _roomService = roomService;
         }
         
@@ -32,9 +30,9 @@ namespace Hotel.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<List<Models.RoomServiceFood>> GetRoomServiceFood([FromQuery(Name = "room")] int? roomNo)
+        public ActionResult<List<Models.RoomService>> GetRoomService([FromQuery(Name = "room")] int? roomNo)
         {
-            return _roomServiceFood.GetRoomServiceFood(roomNo);
+            return _roomService.GetRoomService(roomNo);
         }
         
         [HttpGet("{id}")] 

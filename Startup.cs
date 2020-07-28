@@ -25,7 +25,6 @@ namespace Hotel
             services.AddSingleton<IRoom, Room>();
             services.AddSingleton<IFood, Food>();
             services.AddSingleton<IRoomService, RoomService>();
-            services.AddSingleton<IRoomServiceFood, RoomServiceFood>();
             services.AddSingleton<IBill, Bill>();
         }
 
