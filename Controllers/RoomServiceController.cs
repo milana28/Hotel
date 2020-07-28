@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Hotel.Domain;
+using Hotel.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,22 +8,24 @@ namespace Hotel.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class RoomServiceFoodController : ControllerBase
+    public class RoomServiceController : ControllerBase
     {
         private readonly IRoomServiceFood _roomServiceFood;
+        private readonly IRoomService _roomService;
 
-        public RoomServiceFoodController(IRoomServiceFood roomServiceFood)
+        public RoomServiceController(IRoomServiceFood roomServiceFood, IRoomService roomService)
         {
             _roomServiceFood = roomServiceFood;
+            _roomService = roomService;
         }
         
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status405MethodNotAllowed)]
-        public ActionResult<Models.RoomServiceFood> CreateReservation(Models.RoomServiceFood roomServiceFood)
+        public ActionResult<Models.RoomService> CreateReservation(RoomServiceDto roomServiceDto)
         {
-            return _roomServiceFood.CreateRoomServiceFood(roomServiceFood);
+            return _roomService.CreateRoomService(roomServiceDto);
         }
         
         [HttpGet] 
@@ -38,15 +41,15 @@ namespace Hotel.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<Models.RoomServiceFood> GetRoomServiceById(int id)
+        public ActionResult<Models.RoomService> GetRoomServiceById(int id)
         {
-            var roomServiceFood = _roomServiceFood.GetRoomServiceFoodById(id);
-            if (roomServiceFood == null)
+            var roomService = _roomService.GetRoomServiceById(id);
+            if (roomService == null)
             {
                 return NotFound();
             }
 
-            return roomServiceFood;
+            return roomService;
         }
     }
 }
