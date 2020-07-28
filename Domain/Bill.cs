@@ -24,21 +24,42 @@ namespace Hotel.Domain
         { 
             var orders = _roomService.GetRoomServiceByReservationId(reservationId);
             var ordersForReservation = new List<Models.Food>();
-            
+            var priceOfRoomService = new float();
+            var reservation = _reservation.GetReservationById(reservationId);
+
             orders.ForEach(order =>
             {
-                ordersForReservation = order.Order;
+                order.Order.ForEach(el =>
+                {
+                    ordersForReservation.Add(el);
+                    priceOfRoomService += el.Price;
+                });
             });
 
             return new Models.Bill()
             {
                 Date = DateTime.Now,
-                Reservation = _reservation.GetReservationById(reservationId),
+                Reservation = reservation,
                 Order = ordersForReservation,
-                PriceOfRoom = 0,
-                PriceOfRoomService = 0,
-                TotalPrice = 0
+                PriceOfRoom = GetPriceOfRoom(reservation),
+                PriceOfRoomService = priceOfRoomService,
+                TotalPrice = GetPriceOfRoom(reservation) + priceOfRoomService
             };
+        }
+
+        private static long GetPriceOfRoom(Models.Reservation reservation)
+        {
+            var checkInDate = reservation.CheckInDate;
+            var checkOutDate = reservation.CheckOutDate;
+            var days = new int();
+        
+        
+            if (checkInDate != null && checkOutDate != null)
+            {
+                days = ((TimeSpan) (checkOutDate - checkInDate)).Days; 
+            }
+
+            return  days * reservation.Room.PricePerDay;
         }
     }
 }

@@ -4,5 +4,6 @@ namespace Hotel.Models
     {
         public int RoomNo { set; get; }
         public string Location { set; get; }
+        public int PricePerDay { set; get; }
     }
 }
