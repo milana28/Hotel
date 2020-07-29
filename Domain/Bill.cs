@@ -44,13 +44,13 @@ namespace Hotel.Domain
                 Order = ordersForReservation,
                 PriceOfRoom = GetPriceOfRoom(reservation),
                 PriceOfRoomService = priceOfRoomService,
-                PriceWithoutPdv = GetPriceWithoutPdv(GetPriceOfRoom(reservation) + priceOfRoomService),
-                PDV = 17,
+                PriceWithoutVat = GetPriceWithoutVat(GetPriceOfRoom(reservation) + priceOfRoomService),
+                Vat = 17,
                 TotalPrice = GetPriceOfRoom(reservation) + priceOfRoomService
             };
         }
         
-        private static double GetPriceWithoutPdv(float priceWithPdv)
+        private static double GetPriceWithoutVat(float priceWithPdv)
         {
             return priceWithPdv - (0.17 * priceWithPdv);
         }

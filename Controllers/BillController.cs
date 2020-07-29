@@ -41,7 +41,7 @@ namespace Hotel.Controllers
         {
             var priceOfRoom = _bill.GenerateBill(reservationId).PriceOfRoom;
             var priceOfRoomService = _bill.GenerateBill(reservationId).PriceOfRoomService;
-            var priceWithoutPdv = _bill.GenerateBill(reservationId).PriceWithoutPdv;
+            var priceWithoutVat = _bill.GenerateBill(reservationId).PriceWithoutVat;
             var totalPrice = _bill.GenerateBill(reservationId).TotalPrice;
             var reservation = _reservation.GetReservationById(reservationId);
 
@@ -59,14 +59,14 @@ namespace Hotel.Controllers
                           <td style='border: 1px solid black; width: 20%; padding-left: 10px'>Reservation ID</td>" +
                           "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>Price of room</td>" +
                           "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>Price of room service</td>" +
-                          "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>Price without PDV</td>" +
+                          "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>Price without VAT</td>" +
                           "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>Total price</td>" +
                           "</tr>" +
                           "<tr>" +
                           "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>" + reservationId + "</td>" +
                           "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>" + priceOfRoom + "</td>" +
                           "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>" + priceOfRoomService + "</td>" +
-                          "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>" + priceWithoutPdv + "</td>" +
+                          "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>" + priceWithoutVat + "</td>" +
                           "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>" + totalPrice + "</td>" +
                           "</tr>" +
                           "</table>" +
