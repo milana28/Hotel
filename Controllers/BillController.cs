@@ -56,21 +56,21 @@ namespace Hotel.Controllers
                 Content = @"<html><body>
                           <table style='border-collapse: collapse; width: 100%; height: 60px'>
                           <tr>
-                          <td style='border: 1px solid black; width: 20%; padding-left: 10px'>Reservation ID</td>" +
-                          "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>Price of room</td>" +
-                          "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>Price of room service</td>" +
-                          "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>Price without VAT</td>" +
-                          "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>Total price</td>" +
-                          "</tr>" +
-                          "<tr>" +
+                          <td style='border: 1px solid black; width: 20%; padding-left: 10px'>Reservation ID</td>
+                          <td style='border: 1px solid black; width: 20%; padding-left: 10px'>Price of room</td>
+                          <td style='border: 1px solid black; width: 20%; padding-left: 10px'>Price of room service</td>
+                          <td style='border: 1px solid black; width: 20%; padding-left: 10px'>Price without VAT</td>
+                          <td style='border: 1px solid black; width: 20%; padding-left: 10px'>Total price</td>
+                          </tr>
+                          <tr>" +
                           "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>" + reservationId + "</td>" +
                           "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>" + priceOfRoom + "</td>" +
                           "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>" + priceOfRoomService + "</td>" +
                           "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>" + priceWithoutVat + "</td>" +
                           "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>" + totalPrice + "</td>" +
-                          "</tr>" +
-                          "</table>" +
-                          "</body></html>"
+                          @"</tr>
+                          </table>
+                          </body></html>"
             };
         }
     }
