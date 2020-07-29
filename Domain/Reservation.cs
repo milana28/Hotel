@@ -55,22 +55,27 @@ namespace Hotel.Domain
         
         public Models.Reservation CheckIn(int reservationId)
         {
-            var reservationDao = GetReservationById(reservationId);
+            var reservation = GetReservationById(reservationId);
+
+            if (CheckIfRoomIsAvailable(reservation))
+            {
+                return null;
+            }
 
             using IDbConnection database = new SqlConnection(DatabaseConnectionString); 
             const string insertQuery = "UPDATE Hotel.Reservation SET checkInDate = @checkInDate WHERE id = @id; SELECT * FROM Hotel.Reservation WHERE id = @id";
 
-            return TransformDaoToBusinessLogicReservation(database.QueryFirst<ReservationDao>(insertQuery, new {checkInDate = DateTime.Now, id = reservationDao.Id}));
+            return TransformDaoToBusinessLogicReservation(database.QueryFirst<ReservationDao>(insertQuery, new {checkInDate = DateTime.Now, id = reservation.Id}));
         }
         
         public Models.Reservation CheckOut(int reservationId)
         {
-            var reservationDao = GetReservationById(reservationId);
+            var reservation = GetReservationById(reservationId);
         
             using IDbConnection database = new SqlConnection(DatabaseConnectionString); 
             const string insertQuery = "UPDATE Hotel.Reservation SET checkOutDate = @checkOutDate WHERE id = @id; SELECT * FROM Hotel.Reservation WHERE id = @id";
             
-            return TransformDaoToBusinessLogicReservation(database.QueryFirst<ReservationDao>(insertQuery, new {checkOutDate = DateTime.Now, id = reservationDao.Id}));
+            return TransformDaoToBusinessLogicReservation(database.QueryFirst<ReservationDao>(insertQuery, new {checkOutDate = DateTime.Now, id = reservation.Id}));
         }
         
         public Models.Reservation DeleteReservation(int reservationId)
@@ -123,6 +128,11 @@ namespace Hotel.Domain
                 CheckInDate = reservationDao.CheckInDate,
                 CheckOutDate = reservationDao.CheckOutDate
             };
+        }
+
+        private bool CheckIfRoomIsAvailable(Models.Reservation reservation)
+        {
+            return reservation.CheckInDate == null || reservation.CheckOutDate != null;
         }
         
         private List<Models.Reservation> GeReservationByRoom(int? roomNo)

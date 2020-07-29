@@ -51,10 +51,12 @@ namespace Hotel.Controllers
             }
             
             return new ContentResult {
-                Content = "<html><body>" +
-                          "<table style='border-collapse: collapse; width: 100%; height: 60px'>" +
-                          "<tr>" +
-                          "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>Reservation ID</td>" +
+                ContentType = "text/html",
+                StatusCode = (int) HttpStatusCode.OK,
+                Content = @"<html><body>
+                          <table style='border-collapse: collapse; width: 100%; height: 60px'>
+                          <tr>
+                          <td style='border: 1px solid black; width: 20%; padding-left: 10px'>Reservation ID</td>" +
                           "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>Price of room</td>" +
                           "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>Price of room service</td>" +
                           "<td style='border: 1px solid black; width: 20%; padding-left: 10px'>Price without PDV</td>" +
