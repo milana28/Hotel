@@ -10,6 +10,8 @@ namespace Hotel.Models
         public List<Item> Order { set; get; }
         public float PriceOfRoom { set; get; }
         public float PriceOfRoomService { set; get; }
+        public double PriceWithoutPdv { set; get; }
+        public int PDV { set; get; }
         public float TotalPrice { set; get; }
     }
 }

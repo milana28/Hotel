@@ -43,8 +43,15 @@ namespace Hotel.Domain
                 Order = ordersForReservation,
                 PriceOfRoom = GetPriceOfRoom(reservation),
                 PriceOfRoomService = priceOfRoomService,
+                PriceWithoutPdv = GetPriceWithoutPDV(GetPriceOfRoom(reservation) + priceOfRoomService),
+                PDV = 17,
                 TotalPrice = GetPriceOfRoom(reservation) + priceOfRoomService
             };
+        }
+
+        private double GetPriceWithoutPDV(float priceWithPdv)
+        {
+            return priceWithPdv - (0.17 * priceWithPdv);
         }
 
         private static long GetPriceOfRoom(Models.Reservation reservation)
