@@ -40,18 +40,18 @@ namespace Hotel.Controllers
                 ContentType = "text/html",
                 StatusCode = (int) HttpStatusCode.OK,
                 Content = "<html><body>" +
-                          "<table style='border: 1px solid black; width: 100%; height: 60px'>" +
+                          "<table style='border-collapse: collapse; width: 100%; height: 60px'>" +
                           "<tr>" +
-                          "<td>Price of room</td>" +
-                          "<td>Price of Room service</td>" +
-                          "<td>Price without PDV</td>" +
-                          "<td>Total price</td>" +
+                          "<td style='border: 1px solid black; width: 25%; padding-left: 10px'>Price of room</td>" +
+                          "<td style='border: 1px solid black; width: 25%; padding-left: 10px'>Price of room service</td>" +
+                          "<td style='border: 1px solid black; width: 25%; padding-left: 10px'>Price without PDV</td>" +
+                          "<td style='border: 1px solid black; width: 25%; padding-left: 10px'>Total price</td>" +
                           "</tr>" +
                           "<tr>" +
-                          "<td>" + priceOfRoom + "</td>" +
-                          "<td>" + priceOfRoomService + "</td>" +
-                          "<td>" + priceWithoutPdv + "</td>" +
-                          "<td>" + totalPrice + "</td>" +
+                          "<td style='border: 1px solid black; width: 25%; padding-left: 10px'>" + priceOfRoom + "</td>" +
+                          "<td style='border: 1px solid black; width: 25%; padding-left: 10px'>" + priceOfRoomService + "</td>" +
+                          "<td style='border: 1px solid black; width: 25%; padding-left: 10px'>" + priceWithoutPdv + "</td>" +
+                          "<td style='border: 1px solid black; width: 25%; padding-left: 10px'>" + totalPrice + "</td>" +
                           "</tr>" +
                           "</table>" +
                           "</body></html>"
