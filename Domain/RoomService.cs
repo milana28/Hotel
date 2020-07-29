@@ -117,6 +117,16 @@ namespace Hotel.Domain
             
             return roomServiceItem.Select(r => _item.GetItemById(r.ItemId)).ToList();
         }
+        
+        public Models.RoomService DeleteRoomService(int roomServiceId)
+        {
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+            const string sql = "DELETE FROM Hotel.RoomService WHERE id = @id";
+            
+            database.Execute(sql, new {id = roomServiceId});
+
+            return GetRoomServiceById(roomServiceId);
+        }
 
         private Models.RoomService TransformDaoToBusinessLogicRoomService(RoomServiceDao roomServiceDao)
         {
