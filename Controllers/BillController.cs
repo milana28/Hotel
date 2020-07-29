@@ -31,6 +31,11 @@ namespace Hotel.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<Models.Bill> GenerateBill([FromQuery(Name = "reservationId")] int reservationId)
         {
+            var priceOfRoom = _bill.GenerateBill(reservationId).PriceOfRoom;
+            var priceOfRoomService = _bill.GenerateBill(reservationId).PriceOfRoomService;
+            var priceWithoutPdv = _bill.GenerateBill(reservationId).PriceWithoutPdv;
+            var totalPrice = _bill.GenerateBill(reservationId).TotalPrice;
+            
             return new ContentResult {
                 ContentType = "text/html",
                 StatusCode = (int) HttpStatusCode.OK,
@@ -43,10 +48,10 @@ namespace Hotel.Controllers
                           "<td>Total price</td>" +
                           "</tr>" +
                           "<tr>" +
-                          "<td>Price of room</td>" +
-                          "<td>Price of room</td>" +
-                          "<td>Price of room</td>" +
-                          "<td>Price of room</td>" +
+                          "<td>" + priceOfRoom + "</td>" +
+                          "<td>" + priceOfRoomService + "</td>" +
+                          "<td>" + priceWithoutPdv + "</td>" +
+                          "<td>" + totalPrice + "</td>" +
                           "</tr>" +
                           "</table>" +
                           "</body></html>"

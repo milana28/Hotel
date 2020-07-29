@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Hotel.Models;
 
 namespace Hotel.Domain
 {
@@ -49,8 +50,6 @@ namespace Hotel.Domain
             };
         }
         
-        public 
-
         private static double GetPriceWithoutPdv(float priceWithPdv)
         {
             return priceWithPdv - (0.17 * priceWithPdv);
