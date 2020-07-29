@@ -6,28 +6,28 @@ using Dapper;
 
 namespace Hotel.Domain
 {
-    public interface IFood
+    public interface IItem
     {
-        Models.Food GetFoodById(int id);
-        List<Models.Food> GetAll();
+        Models.Item GetItemById(int id);
+        List<Models.Item> GetAll();
     }
     
-    public class Food : IFood
+    public class Item : IItem
     {
         private const string DatabaseConnectionString = "Server=localhost;Database=hotel;User Id=sa;Password=yourStrong(!)Password;";
         
-        public Models.Food GetFoodById(int id)
+        public Models.Item GetItemById(int id)
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            const string sql = "SELECT * FROM Hotel.Food WHERE id = @foodId";
+            const string sql = "SELECT * FROM Hotel.Item WHERE id = @itemId";
 
-            return database.QuerySingle<Models.Food>(sql, new {foodId = id});
+            return database.QuerySingle<Models.Item>(sql, new {itemId = id});
         }
         
-        public List<Models.Food> GetAll()
+        public List<Models.Item> GetAll()
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            return database.Query<Models.Food>("SELECT * FROM Hotel.Food").ToList();
+            return database.Query<Models.Item>("SELECT * FROM Hotel.Item").ToList();
         }
     }
 }

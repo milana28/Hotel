@@ -14,19 +14,19 @@ namespace Hotel.Domain
         Models.RoomService CreateRoomService(RoomServiceDto roomServiceDto);
         List<Models.RoomService> GetRoomService(int? roomNo);
         List<Models.RoomService> GetRoomServiceByReservationId(int? id);
-        List<Models.Food> GetFoodForRoomService(int roomServiceId);
+        List<Models.Item> GetItemForRoomService(int roomServiceId);
     }
     
     public class RoomService : IRoomService
     {
         private const string DatabaseConnectionString = "Server=localhost;Database=hotel;User Id=sa;Password=yourStrong(!)Password;";
         private readonly IReservation _reservation;
-        private readonly IFood _food;
+        private readonly IItem _item;
 
-        public RoomService(IReservation reservation, IFood food)
+        public RoomService(IReservation reservation, IItem item)
         {
             _reservation = reservation;
-            _food = food;
+            _item = item;
         }
 
         public Models.RoomService CreateRoomService(RoomServiceDto roomServiceDto)
@@ -44,19 +44,19 @@ namespace Hotel.Domain
             var orderItems = new List<int>(roomServiceDto.OrderId);
             orderItems.ForEach(item =>
             {
-                if (CheckIfFoodExist(item) == null)
+                if (CheckIfItemExist(item) == null)
                 {
                     return;
                 }
                     
-                var roomServiceFoodDao = new RoomServiceFoodDao()
+                var roomServiceFoodDao = new RoomServiceItemDao()
                 {
                     RoomServiceId = roomService.Id,
-                    FoodId = item
+                    ItemId = item
                 };
 
                 using IDbConnection connection = new SqlConnection(DatabaseConnectionString); 
-                const string insertQuery = "INSERT INTO Hotel.RoomService_Food VALUES (@roomServiceId, @foodId)";
+                const string insertQuery = "INSERT INTO Hotel.RoomService_Item VALUES (@roomServiceId, @itemId)";
                 connection.Execute(insertQuery, roomServiceFoodDao);
             });
 
@@ -108,14 +108,14 @@ namespace Hotel.Domain
             return roomServiceList;
         }
         
-        public List<Models.Food> GetFoodForRoomService(int roomServiceId)
+        public List<Models.Item> GetItemForRoomService(int roomServiceId)
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            const string sql = "SELECT * FROM Hotel.RoomService_Food WHERE roomServiceId = @id";
+            const string sql = "SELECT * FROM Hotel.RoomService_Item WHERE roomServiceId = @id";
             
-            var roomServiceFood = database.Query<RoomServiceFoodDao>(sql, new {id = roomServiceId}).ToList();
+            var roomServiceItem = database.Query<RoomServiceItemDao>(sql, new {id = roomServiceId}).ToList();
             
-            return roomServiceFood.Select(r => _food.GetFoodById(r.FoodId)).ToList();
+            return roomServiceItem.Select(r => _item.GetItemById(r.ItemId)).ToList();
         }
 
         private Models.RoomService TransformDaoToBusinessLogicRoomService(RoomServiceDao roomServiceDao)
@@ -128,8 +128,8 @@ namespace Hotel.Domain
                     new {reservationId = roomServiceDao.ReservationId});
             var reservation = _reservation.TransformDaoToBusinessLogicReservation(reservationDao);
             
-            const string foodQuery = "SELECT f.* FROM Hotel.RoomService_Food as r JOIN Hotel.Food as f ON r.foodId = f.id WHERE roomServiceId = @roomServiceId";
-            var order = database.Query<Models.Food>(foodQuery, new {roomServiceId = roomServiceDao.Id}).ToList();
+            const string foodQuery = "SELECT f.* FROM Hotel.RoomService_Item as r JOIN Hotel.Item as f ON r.itemId = f.id WHERE roomServiceId = @roomServiceId";
+            var order = database.Query<Models.Item>(foodQuery, new {roomServiceId = roomServiceDao.Id}).ToList();
 
             return new Models.RoomService()
             {
@@ -160,9 +160,9 @@ namespace Hotel.Domain
             return roomServiceList;
         }
         
-        private Models.Food CheckIfFoodExist(int foodId)
+        private Models.Item CheckIfItemExist(int itemId)
         {
-            return _food.GetFoodById(foodId);
+            return _item.GetItemById(itemId);
         }
         
         private Models.Reservation CheckIfReservationExist(int reservationId)

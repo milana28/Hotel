@@ -1,9 +1,9 @@
 namespace Hotel.Models
 {
-    public class RoomServiceFoodDao
+    public class RoomServiceItemDao
     {
         public int Id { set; get; }
         public int RoomServiceId { set; get; }
-        public int FoodId { set; get; }
+        public int ItemId { set; get; }
     }
 }

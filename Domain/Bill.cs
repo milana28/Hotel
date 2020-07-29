@@ -23,7 +23,7 @@ namespace Hotel.Domain
         public Models.Bill GenerateBill(int reservationId)
         { 
             var orders = _roomService.GetRoomServiceByReservationId(reservationId);
-            var ordersForReservation = new List<Models.Food>();
+            var ordersForReservation = new List<Models.Item>();
             var priceOfRoomService = new float();
             var reservation = _reservation.GetReservationById(reservationId);
 
