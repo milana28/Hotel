@@ -57,7 +57,7 @@ namespace Hotel.Domain
         {
             var reservation = GetReservationById(reservationId);
 
-            if (CheckIfRoomIsAvailable(reservation) != null)
+            if (GetReservationIfRoomNotAvailable(reservation) != null)
             {
                 return null;
             }
@@ -130,7 +130,7 @@ namespace Hotel.Domain
             };
         }
 
-        private Models.Reservation CheckIfRoomIsAvailable(Models.Reservation reservation)
+        private Models.Reservation GetReservationIfRoomNotAvailable(Models.Reservation reservation)
         {
             var roomNo = reservation.Room.RoomNo;
             var reservations = GetReservationByRoom(roomNo);
