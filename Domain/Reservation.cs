@@ -57,7 +57,7 @@ namespace Hotel.Domain
         {
             var reservation = GetReservationById(reservationId);
 
-            if (CheckIfRoomIsAvailable(reservation))
+            if (CheckIfRoomIsAvailable(reservation) != null)
             {
                 return null;
             }
@@ -106,7 +106,7 @@ namespace Hotel.Domain
                 return GeReservationByCustomerName(name);
             }
             
-            return roomNo == null ? GetAll() : GeReservationByRoom(roomNo);
+            return roomNo == null ? GetAll() : GetReservationByRoom(roomNo);
         }
         
         public Models.Reservation TransformDaoToBusinessLogicReservation(ReservationDao reservationDao)
@@ -130,12 +130,16 @@ namespace Hotel.Domain
             };
         }
 
-        private bool CheckIfRoomIsAvailable(Models.Reservation reservation)
+        private Models.Reservation CheckIfRoomIsAvailable(Models.Reservation reservation)
         {
-            return reservation.CheckInDate == null || reservation.CheckOutDate != null;
+            var roomNo = reservation.Room.RoomNo;
+            var reservations = GetReservationByRoom(roomNo);
+
+            return reservations.FirstOrDefault(r =>
+                r.CheckInDate != null && r.CheckInDate <= DateTime.Now && r.CheckOutDate == null);
         }
         
-        private List<Models.Reservation> GeReservationByRoom(int? roomNo)
+        private List<Models.Reservation> GetReservationByRoom(int? roomNo)
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             const string sql = "SELECT * FROM Hotel.Reservation WHERE roomNo = @number";
