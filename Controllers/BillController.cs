@@ -10,10 +10,12 @@ namespace Hotel.Controllers
     public class BillController : ControllerBase
     {
         private readonly IBill _bill;
+        private readonly IReservation _reservation;
 
-        public BillController(IBill bill)
+        public BillController(IBill bill, IReservation reservation)
         {
             _bill = bill;
+            _reservation = reservation;
         }
 
         // [HttpGet]
@@ -22,7 +24,13 @@ namespace Hotel.Controllers
         // [ProducesResponseType(StatusCodes.Status404NotFound)]
         // public ActionResult<Models.Bill> GenerateBill([FromQuery(Name = "reservationId")] int reservationId)
         // {
-        //     return _bill.GenerateBill(reservationId);
+        //        var reservation = _reservation.GetReservationById(reservationId);
+        //        if (reservation == null)
+        //        {
+        //            return NotFound();
+        //        }
+               
+        //     return reservation;
         // }
         
         [HttpGet]
@@ -35,10 +43,14 @@ namespace Hotel.Controllers
             var priceOfRoomService = _bill.GenerateBill(reservationId).PriceOfRoomService;
             var priceWithoutPdv = _bill.GenerateBill(reservationId).PriceWithoutPdv;
             var totalPrice = _bill.GenerateBill(reservationId).TotalPrice;
+            var reservation = _reservation.GetReservationById(reservationId);
+
+            if (reservation == null)
+            {
+                return NotFound();
+            }
             
             return new ContentResult {
-                ContentType = "text/html",
-                StatusCode = (int) HttpStatusCode.OK,
                 Content = "<html><body>" +
                           "<table style='border-collapse: collapse; width: 100%; height: 60px'>" +
                           "<tr>" +
