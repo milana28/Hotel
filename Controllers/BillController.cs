@@ -40,7 +40,7 @@ namespace Hotel.Controllers
                 ContentType = "text/html",
                 StatusCode = (int) HttpStatusCode.OK,
                 Content = "<html><body>" +
-                          "<table>" +
+                          "<table style='border: 1px solid black; width: 100%; height: 60px'>" +
                           "<tr>" +
                           "<td>Price of room</td>" +
                           "<td>Price of Room service</td>" +
