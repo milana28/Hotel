@@ -15,6 +15,7 @@ namespace Hotel.Domain
         List<Models.RoomService> GetRoomService(int? roomNo);
         List<Models.RoomService> GetRoomServiceByReservationId(int? id);
         List<Models.Item> GetItemForRoomService(int roomServiceId);
+        Models.RoomService DeleteRoomService(int roomServiceId);
     }
     
     public class RoomService : IRoomService

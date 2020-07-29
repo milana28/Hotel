@@ -3,6 +3,7 @@ using Hotel.Domain;
 using Hotel.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hotel.Controllers
 {
@@ -42,6 +43,21 @@ namespace Hotel.Controllers
         public ActionResult<Models.RoomService> GetRoomServiceById(int id)
         {
             var roomService = _roomService.GetRoomServiceById(id);
+            if (roomService == null)
+            {
+                return NotFound();
+            }
+
+            return roomService;
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<Models.RoomService> DeleteRoomService(int id)
+        {
+            var roomService = _roomService.DeleteRoomService(id);
             if (roomService == null)
             {
                 return NotFound();
