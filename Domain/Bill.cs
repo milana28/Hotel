@@ -48,6 +48,8 @@ namespace Hotel.Domain
                 TotalPrice = GetPriceOfRoom(reservation) + priceOfRoomService
             };
         }
+        
+        public 
 
         private static double GetPriceWithoutPdv(float priceWithPdv)
         {
