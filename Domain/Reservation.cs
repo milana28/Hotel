@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics.Eventing.Reader;
+using System.Globalization;
 using System.Linq;
 using Dapper;
 using Hotel.Models;
@@ -40,7 +41,7 @@ namespace Hotel.Domain
             {
                 CustomerId = reservation.CustomerId,
                 RoomNo = reservation.RoomNo,
-                Date = DateTime.Now,
+                Date = DateTime.Now.Date,
                 CheckInDate = null,
                 CheckOutDate = null
             };
@@ -68,17 +69,22 @@ namespace Hotel.Domain
             using IDbConnection database = new SqlConnection(DatabaseConnectionString); 
             const string insertQuery = "UPDATE Hotel.Reservation SET checkInDate = @checkInDate WHERE id = @id; SELECT * FROM Hotel.Reservation WHERE id = @id";
 
-            return TransformDaoToBusinessLogicReservation(database.QueryFirst<ReservationDao>(insertQuery, new {checkInDate = DateTime.Now, id = reservation.Id}));
+            return TransformDaoToBusinessLogicReservation(database.QueryFirst<ReservationDao>(insertQuery, new {checkInDate = DateTime.Now.Date, id = reservation.Id}));
         }
         
         public Models.Reservation CheckOut(int reservationId)
         {
             var reservation = GetReservationById(reservationId);
+            
+            if (reservation.CheckInDate == null)
+            {
+                return null;
+            }
         
             using IDbConnection database = new SqlConnection(DatabaseConnectionString); 
             const string insertQuery = "UPDATE Hotel.Reservation SET checkOutDate = @checkOutDate WHERE id = @id; SELECT * FROM Hotel.Reservation WHERE id = @id";
             
-            return TransformDaoToBusinessLogicReservation(database.QueryFirst<ReservationDao>(insertQuery, new {checkOutDate = DateTime.Now, id = reservation.Id}));
+            return TransformDaoToBusinessLogicReservation(database.QueryFirst<ReservationDao>(insertQuery, new {checkOutDate = DateTime.Now.Date, id = reservation.Id}));
         }
         
         public Models.Reservation DeleteReservation(int reservationId)
@@ -179,6 +185,13 @@ namespace Hotel.Domain
          
             return roomsDto;
         }
+
+        // public List<Models.Room> GetAvailableRoomsForDate(DateTime date)
+        // {
+        //     var reservations = GetAll();
+        //     reservations.FindAll(r => )
+        //
+        // }
 
         private Models.Reservation GetCurrentReservationForRoom(int roomNo)
         {
