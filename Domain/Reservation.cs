@@ -20,7 +20,7 @@ namespace Hotel.Domain
         Models.Reservation CheckOut(int reservationId);
         Models.Reservation TransformDaoToBusinessLogicReservation(ReservationDao reservationDao);
         List<Models.Reservation> GetReservationsByRoom(int? roomNo);
-        List<RoomDto> GetRooms();
+        List<RoomDto> GetRooms(DateTime? date);
     }
     
     public class Reservation : IReservation
@@ -152,8 +152,14 @@ namespace Hotel.Domain
             return reservations;
         }
         
-        public List<RoomDto> GetRooms()
+        public List<RoomDto> GetRooms(DateTime? date)
         {
+
+            if (date != null)
+            {
+               return GetAvailableRoomsForDate(date);
+            }
+
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             var rooms =  database.Query<Models.Room>("SELECT * FROM Hotel.Room").ToList();
             var roomsDto = new List<RoomDto>();
@@ -186,12 +192,27 @@ namespace Hotel.Domain
             return roomsDto;
         }
 
-        // public List<Models.Room> GetAvailableRoomsForDate(DateTime date)
-        // {
-        //     var reservations = GetAll();
-        //     reservations.FindAll(r => )
-        //
-        // }
+        private List<RoomDto> GetAvailableRoomsForDate(DateTime? date)
+        {
+            var reservations = GetAll();
+            var rooms = _room.GetAll();
+            List<Models.Room> availableRooms;
+            var availableRoomsDto = new List<RoomDto>();
+            var reservationsForDate = reservations.FindAll(r => r.CheckInDate <= date && r.CheckOutDate == null);
+            reservationsForDate.ForEach(r =>
+            {
+                availableRooms = rooms.FindAll(room => room.RoomNo != r.Room.RoomNo);
+                availableRooms.ForEach(r => availableRoomsDto.Add(new RoomDto()
+                {
+                    RoomNo = r.RoomNo,
+                    Location = r.Location,
+                    PricePerDay = r.PricePerDay,
+                    Available = true
+                }));
+            });
+
+            return availableRoomsDto;
+        }
 
         private Models.Reservation GetCurrentReservationForRoom(int roomNo)
         {

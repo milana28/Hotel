@@ -11,6 +11,7 @@ namespace Hotel.Domain
     public interface IRoom
     {
         Models.Room GetRoomByRoomNo(int roomNo);
+        List<Models.Room> GetAll();
     }
     public class Room : IRoom
     {
@@ -24,6 +25,12 @@ namespace Hotel.Domain
             var room =  database.QuerySingle<Models.Room>(sql, new {number = roomNo});
 
             return room;
+        }
+        
+        public List<Models.Room> GetAll()
+        {
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+            return  database.Query<Models.Room>("SELECT * FROM Hotel.Room").ToList();
         }
     }
 }

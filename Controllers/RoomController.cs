@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Hotel.Domain;
 using Hotel.Models;
@@ -23,9 +24,9 @@ namespace Hotel.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<List<RoomDto>> GetRooms()
+        public ActionResult<List<RoomDto>> GetRooms([FromQuery(Name = "date")] DateTime? date)
         {
-            return _reservation.GetRooms();
+            return _reservation.GetRooms(date);
         }
     }
 }
