@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using Dapper;
 using Hotel.Models;
@@ -17,6 +18,8 @@ namespace Hotel.Domain
         Models.Reservation CheckIn(int reservationId);
         Models.Reservation CheckOut(int reservationId);
         Models.Reservation TransformDaoToBusinessLogicReservation(ReservationDao reservationDao);
+        List<Models.Reservation> GetReservationsByRoom(int? roomNo);
+        List<RoomDto> GetRooms();
     }
     
     public class Reservation : IReservation
@@ -106,7 +109,7 @@ namespace Hotel.Domain
                 return GeReservationByCustomerName(name);
             }
             
-            return roomNo == null ? GetAll() : GetReservationByRoom(roomNo);
+            return roomNo == null ? GetAll() : GetReservationsByRoom(roomNo);
         }
         
         public Models.Reservation TransformDaoToBusinessLogicReservation(ReservationDao reservationDao)
@@ -129,17 +132,8 @@ namespace Hotel.Domain
                 CheckOutDate = reservationDao.CheckOutDate
             };
         }
-
-        private Models.Reservation GetReservationIfRoomNotAvailable(Models.Reservation reservation)
-        {
-            var roomNo = reservation.Room.RoomNo;
-            var reservations = GetReservationByRoom(roomNo);
-
-            return reservations.FirstOrDefault(r =>
-                r.CheckInDate != null && r.CheckInDate <= DateTime.Now && r.CheckOutDate == null);
-        }
         
-        private List<Models.Reservation> GetReservationByRoom(int? roomNo)
+        public List<Models.Reservation> GetReservationsByRoom(int? roomNo)
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);
             const string sql = "SELECT * FROM Hotel.Reservation WHERE roomNo = @number";
@@ -152,6 +146,55 @@ namespace Hotel.Domain
             return reservations;
         }
         
+        public List<RoomDto> GetRooms()
+        {
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+            var rooms =  database.Query<Models.Room>("SELECT * FROM Hotel.Room").ToList();
+            var roomsDto = new List<RoomDto>();
+
+            rooms.ForEach(room =>
+            {
+                if (GetCurrentReservationForRoom(room.RoomNo) != null)
+                {
+                    roomsDto.Add(new RoomDto()
+                    {
+                        RoomNo = room.RoomNo,
+                        Location = room.Location,
+                        PricePerDay = room.PricePerDay,
+                        Available = false
+                    });
+                }
+
+                if (GetCurrentReservationForRoom(room.RoomNo) == null)
+                {
+                    roomsDto.Add(new RoomDto()
+                    {
+                        RoomNo = room.RoomNo,
+                        Location = room.Location,
+                        PricePerDay = room.PricePerDay,
+                        Available = true
+                    });
+                }
+            });
+         
+            return roomsDto;
+        }
+
+        private Models.Reservation GetCurrentReservationForRoom(int roomNo)
+        {
+            var reservationsForRoom = GetReservationsByRoom(roomNo);
+            return reservationsForRoom.Find(r => r.CheckOutDate == null);
+        }
+     
+        private Models.Reservation GetReservationIfRoomNotAvailable(Models.Reservation reservation)
+        {
+            var roomNo = reservation.Room.RoomNo;
+            var reservations = GetReservationsByRoom(roomNo);
+
+            return reservations.FirstOrDefault(r =>
+                r.CheckInDate != null && r.CheckInDate <= DateTime.Now && r.CheckOutDate == null);
+        }
+
         private List<Models.Reservation> GeReservationByCustomerName(string? name)
         {
             using IDbConnection database = new SqlConnection(DatabaseConnectionString);

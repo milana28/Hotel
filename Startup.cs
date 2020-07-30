@@ -21,8 +21,8 @@ namespace Hotel
         {
             services.AddControllers();
             services.AddSingleton<ICustomer, Customer>();
-            services.AddSingleton<IReservation, Reservation>();
             services.AddSingleton<IRoom, Room>();
+            services.AddSingleton<IReservation, Reservation>();
             services.AddSingleton<IItem, Item>();
             services.AddSingleton<IRoomService, RoomService>();
             services.AddSingleton<IBill, Bill>();
