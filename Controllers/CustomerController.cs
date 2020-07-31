@@ -65,6 +65,5 @@ namespace Hotel.Controllers
             
             return _customer.DeleteCustomer(customerId);
         }
-      
     }
 }
