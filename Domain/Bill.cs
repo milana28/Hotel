@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Hotel.Models;
 
 namespace Hotel.Domain
 {
