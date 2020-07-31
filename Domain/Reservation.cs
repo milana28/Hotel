@@ -212,18 +212,37 @@ namespace Hotel.Domain
             List<Models.Room> availableRooms;
             var availableRoomsDto = new List<RoomDto>();
             var reservationsForDate = reservations.FindAll(r => r.CheckInDate <= date && r.CheckOutDate == null && r.CheckInDate.AddDays(r.DaysToStay) > date);
-            reservationsForDate.ForEach(r =>
-            {
-                availableRooms = rooms.FindAll(room => room.RoomNo != r.Room.RoomNo);
-                availableRooms.ForEach(r => availableRoomsDto.Add(new RoomDto()
-                {
-                    RoomNo = r.RoomNo,
-                    Location = r.Location,
-                    PricePerDay = r.PricePerDay,
-                    Available = true
-                }));
-            });
 
+            if (reservationsForDate.Count != 0)
+            {
+                reservationsForDate.ForEach(r =>
+                {
+                    availableRooms = rooms.FindAll(room => room.RoomNo != r.Room.RoomNo);
+                    availableRooms.ForEach(r => availableRoomsDto.Add(new RoomDto()
+                    {
+                        RoomNo = r.RoomNo,
+                        Location = r.Location,
+                        PricePerDay = r.PricePerDay,
+                        Available = true
+                    }));
+                });
+            }
+
+            if (reservationsForDate.Count == 0)
+            {
+                rooms.ForEach(room =>
+                { 
+                    availableRoomsDto.Add(new RoomDto()
+                    {
+                        RoomNo = room.RoomNo,
+                        Location = room.Location,
+                        PricePerDay = room.PricePerDay,
+                        Available = true
+                    });
+                });
+
+            }
+           
             return availableRoomsDto;
         }
 
