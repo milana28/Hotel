@@ -46,7 +46,7 @@ namespace Hotel.Controllers
             var reservation = _reservation.GetReservationById(reservationId);
             if (reservation == null)
             {
-                return NotFound();
+                return NotFound("No reservation found with this ID!");
             }
 
             return reservation;
@@ -62,7 +62,7 @@ namespace Hotel.Controllers
 
             if (reservation == null)
             {
-                return NotFound();
+                return NotFound("No reservation found with this ID!");
             }
 
             return _reservation.DeleteReservation(reservationId);
@@ -79,7 +79,7 @@ namespace Hotel.Controllers
                 var reservation = _reservation.GetReservationById(reservationId);
                 if (reservation == null)
                 {
-                    return NotFound();
+                    return NotFound("No reservation found with this ID!");
                 }
 
                 return _reservation.CheckIn(reservationId);
@@ -101,7 +101,7 @@ namespace Hotel.Controllers
                 var reservation = _reservation.GetReservationById(reservationId);
                 if (reservation == null)
                 {
-                    return NotFound();
+                    return NotFound("No reservation found with this ID!");
                 }
 
                 return _reservation.CheckOut(reservationId);
