@@ -19,7 +19,6 @@ namespace Hotel.Domain
         Models.Reservation CheckIn(int reservationId);
         Models.Reservation CheckOut(int reservationId);
         Models.Reservation TransformDaoToBusinessLogicReservation(ReservationDao reservationDao);
-        List<Models.Reservation> GetReservationsByRoom(int? roomNo);
         List<RoomDto> GetRooms(DateTime? date);
     }
     
@@ -137,24 +136,13 @@ namespace Hotel.Domain
                 Customer = customer,
                 Room = room,
                 Date = reservationDao.Date, 
+                PlannedArrivalDate = reservationDao.PlannedArrivalDate,
+                DaysToStay = reservationDao.DaysToStay,
                 CheckInDate = reservationDao.CheckInDate,
                 CheckOutDate = reservationDao.CheckOutDate
             };
         }
-        
-        public List<Models.Reservation> GetReservationsByRoom(int? roomNo)
-        {
-            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            const string sql = "SELECT * FROM Hotel.Reservation WHERE roomNo = @number";
-            
-            var reservationsDao = database.Query<ReservationDao>(sql, new {number = roomNo}).ToList();
-           
-            var reservations = new List<Models.Reservation>();
-            reservationsDao.ForEach(r => reservations.Add(TransformDaoToBusinessLogicReservation(r)));
-            
-            return reservations;
-        }
-        
+
         public List<RoomDto> GetRooms(DateTime? date)
         {
 
@@ -193,6 +181,30 @@ namespace Hotel.Domain
             });
          
             return roomsDto;
+        }
+        
+        private List<Models.Reservation> GetAll()
+        {
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+            var reservationsDao = database.Query<ReservationDao>("SELECT * FROM Hotel.Reservation").ToList();
+            var reservations = new List<Models.Reservation>();
+            
+            reservationsDao.ForEach(r => reservations.Add(TransformDaoToBusinessLogicReservation(r)));
+
+            return reservations;
+        }
+
+        private List<Models.Reservation> GetReservationsByRoom(int? roomNo)
+        {
+            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
+            const string sql = "SELECT * FROM Hotel.Reservation WHERE roomNo = @number";
+            
+            var reservationsDao = database.Query<ReservationDao>(sql, new {number = roomNo}).ToList();
+           
+            var reservations = new List<Models.Reservation>();
+            reservationsDao.ForEach(r => reservations.Add(TransformDaoToBusinessLogicReservation(r)));
+            
+            return reservations;
         }
 
         private List<RoomDto> GetAvailableRoomsForDate(DateTime? date)
@@ -245,17 +257,6 @@ namespace Hotel.Domain
             return reservations;
         }
         
-        private List<Models.Reservation> GetAll()
-        {
-            using IDbConnection database = new SqlConnection(DatabaseConnectionString);
-            var reservationsDao = database.Query<ReservationDao>("SELECT * FROM Hotel.Reservation").ToList();
-            var reservations = new List<Models.Reservation>();
-            
-            reservationsDao.ForEach(r => reservations.Add(TransformDaoToBusinessLogicReservation(r)));
-
-            return reservations;
-        }
-
         private Models.Room CheckIfRoomExist(int roomNo)
         {
             return _room.GetRoomByRoomNo(roomNo);
