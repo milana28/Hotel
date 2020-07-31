@@ -34,7 +34,7 @@ namespace Hotel.Controllers
             var item = _item.GetItemById(id);
             if (item == null)
             {
-                return NotFound();
+                return NotFound("No item found with this ID!");
             }
 
             return item;
