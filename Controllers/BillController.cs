@@ -47,7 +47,7 @@ namespace Hotel.Controllers
 
             if (reservation == null)
             {
-                return NotFound();
+                return NotFound("No reservation found with this ID!");
             }
             
             return new ContentResult {

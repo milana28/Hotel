@@ -44,7 +44,7 @@ namespace Hotel.Controllers
             var customer = _customer.GetCustomerById(customerId);
             if (customer == null)
             {
-                return NotFound();
+                return NotFound("No customer found with this ID!");
             }
 
             return customer;
@@ -54,16 +54,16 @@ namespace Hotel.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<Models.Customer> DeleteCustomer(int guestId)
+        public ActionResult<Models.Customer> DeleteCustomer(int customerId)
         {
-            var guest = _customer.GetCustomerById(guestId);
+            var customer = _customer.GetCustomerById(customerId);
             
-            if (guest == null)
+            if (customer == null)
             {
-                return NotFound();
+                return NotFound("No customer found with this ID!");
             }
             
-            return _customer.DeleteCustomer(guestId);
+            return _customer.DeleteCustomer(customerId);
         }
       
     }
