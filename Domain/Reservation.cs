@@ -42,6 +42,8 @@ namespace Hotel.Domain
                 CustomerId = reservation.CustomerId,
                 RoomNo = reservation.RoomNo,
                 Date = DateTime.Now.Date,
+                PlannedArrivalDate = reservation.PlannedArrivalDate,
+                DaysToStay = reservation.DaysToStay,
                 CheckInDate = null,
                 CheckOutDate = null
             };
@@ -52,7 +54,8 @@ namespace Hotel.Domain
             }
         
             using IDbConnection database = new SqlConnection(DatabaseConnectionString); 
-            const string insertQuery = "INSERT INTO Hotel.Reservation VALUES (@customerId, @roomNo, @date, @checkInDate, @checkOutDate); SELECT * FROM Hotel.Reservation WHERE id = SCOPE_IDENTITY()";
+            const string insertQuery = 
+                "INSERT INTO Hotel.Reservation VALUES (@customerId, @roomNo, @date, @plannedArrivalDate, @daysToStay, @checkInDate, @checkOutDate); SELECT * FROM Hotel.Reservation WHERE id = SCOPE_IDENTITY()";
 
             return TransformDaoToBusinessLogicReservation(database.QueryFirst<ReservationDao>(insertQuery, reservationDao));
         }
