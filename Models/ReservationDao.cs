@@ -10,7 +10,7 @@ namespace Hotel.Models
         public DateTime Date { set; get; }
         public DateTime PlannedArrivalDate { set; get; }
         public int DaysToStay { set; get; }
-        public DateTime? CheckInDate { set; get; }
+        public DateTime CheckInDate { set; get; }
         public DateTime? CheckOutDate { set; get; }
     }
 }

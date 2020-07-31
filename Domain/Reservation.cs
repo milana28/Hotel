@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Diagnostics.Eventing.Reader;
-using System.Globalization;
 using System.Linq;
 using Dapper;
 using Hotel.Models;
@@ -43,7 +41,7 @@ namespace Hotel.Domain
                 Date = DateTime.Now.Date,
                 PlannedArrivalDate = reservation.PlannedArrivalDate,
                 DaysToStay = reservation.DaysToStay,
-                CheckInDate = null,
+                CheckInDate = reservation.PlannedArrivalDate,
                 CheckOutDate = null
             };
                 
@@ -213,7 +211,7 @@ namespace Hotel.Domain
             var rooms = _room.GetAll();
             List<Models.Room> availableRooms;
             var availableRoomsDto = new List<RoomDto>();
-            var reservationsForDate = reservations.FindAll(r => r.CheckInDate <= date && r.CheckOutDate == null);
+            var reservationsForDate = reservations.FindAll(r => r.CheckInDate <= date && r.CheckOutDate == null && r.CheckInDate.AddDays(r.DaysToStay) > date);
             reservationsForDate.ForEach(r =>
             {
                 availableRooms = rooms.FindAll(room => room.RoomNo != r.Room.RoomNo);
