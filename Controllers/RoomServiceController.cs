@@ -3,7 +3,6 @@ using Hotel.Domain;
 using Hotel.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Hotel.Controllers
 {
@@ -45,7 +44,7 @@ namespace Hotel.Controllers
             var roomService = _roomService.GetRoomServiceById(id);
             if (roomService == null)
             {
-                return NotFound();
+                return NotFound("No room service found with this ID!");
             }
 
             return roomService;
@@ -60,7 +59,7 @@ namespace Hotel.Controllers
             var roomService = _roomService.DeleteRoomService(id);
             if (roomService == null)
             {
-                return NotFound();
+                return NotFound("No room service found with this ID!");
             }
 
             return roomService;

@@ -11,12 +11,10 @@ namespace Hotel.Controllers
     [Route("[controller]")]
     public class RoomController : ControllerBase
     {
-        private readonly IRoom _room;
         private readonly IReservation _reservation;
 
-        public RoomController(IRoom room, IReservation reservation)
+        public RoomController(IReservation reservation)
         {
-            _room = room;
             _reservation = reservation;
         }
 
