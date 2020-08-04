@@ -35,7 +35,7 @@ namespace Hotel
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Pet store");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Hotel");
             });
             
             if (env.IsDevelopment())
